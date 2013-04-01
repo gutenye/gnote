@@ -1,0 +1,5 @@
+dir: ~/note
+output: ~/tags
+mark: *
+
+# vim: ft=yaml

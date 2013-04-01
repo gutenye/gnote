@@ -1,0 +1,10 @@
+[Unit]
+Description=gnote service
+
+[Service]
+Type=simple
+User=%i
+ExecStart=/usr/bin/gnote watch
+
+[Install]
+WantedBy=multi-user.target
