@@ -14,7 +14,9 @@
 #   ./build.sh release                # build $RELEASEs with user complied go and upload the package to s3.
 
 APP="gnote"
+PD_FILES="main.go"
 EXTRA_FILES=""
+
 RELEASE="homebrew/amd64 homebrew/386 windows/386 windows/amd64"
 VERSION=$(sed -rn 's/.*const VERSION.*"([0-9.]+)".*/\1/p' main.go)
 declare -A OS_MAP=(
@@ -48,7 +50,7 @@ function build {
 	rsync -a --del --exclude '.*' . /tmp/$APP/
 
 	echo -e "\nbuilding $platform/$arch"
-	find -name '*.go' | xargs sed -i 's|^import . "github.com/GutenYe/tagen.go/pd".*||'
+	[ -n $PD_FILES ] && sed -i 's|^import . "github.com/GutenYe/tagen.go/pd".*||' $PD_FILES
 	CGO_ENABLED=$(cgo_enabled $os) GOOS=$os GOARCH=$arch $GOROOT/bin/go build -o "dist/$APP$(ext $os)"
 
 	rsync -a /tmp/$APP/ .
