@@ -1,9 +1,7 @@
 [Unit]
-Description=gnote service
+Description=Gnote Service
 
 [Service]
-Type=simple
-User=%i
 ExecStart=/usr/bin/gnote watch
 
 [Install]
