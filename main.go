@@ -1,18 +1,15 @@
 package main
 
-import ( 
+import (
 	. "./globals/rc"
 	. "./globals/ui"
 	"os"
 	"github.com/ogier/pflag"
 	"log"
-	"github.com/GutenYe/tagen.go/os2"
-	"github.com/GutenYe/tagen.go/path2/filepath2"
 	"launchpad.net/goyaml"
 	"io/ioutil"
 	"path/filepath"
 )
-import . "github.com/GutenYe/tagen.go/pd"; var pd = Pd
 
 const VERSION = "0.0.1"
 var homeRc = filepath.Join(os.Getenv("HOME"), ".gnoterc")
@@ -47,7 +44,7 @@ func main(){
 		os.Exit(0)
 	}
 
-	if os2.IsExist(homeRc) {
+	if IsExist(homeRc) {
 		d, e := ioutil.ReadFile(homeRc)
 		if e != nil { Ui.Fatal(e) }
 		goyaml.Unmarshal(d, &Rc)
@@ -57,7 +54,27 @@ func main(){
 	if *output != "" { Rc.Output = *output }
 	if *cache != "" { Rc.Cache = *cache }
 	if *mark != "" { Rc.Mark = *mark }
-	Rc.Dir, Rc.Output, Rc.Cache = filepath2.ExtendAbs2(Rc.Dir), filepath2.ExtendAbs2(Rc.Output), filepath2.ExtendAbs2(Rc.Cache)
+
+  var err error
+  Rc.Dir, err = AbsWithExtend(Rc.Dir)
+  if err != nil { Ui.Panic(Rc.Dir) }
+  if IsNotExist(Rc.Dir) {
+    Ui.Printf("--dir `%s` does not exists", Rc.Dir)
+    os.Exit(1)
+  }
+  Rc.Dir, _ = filepath.EvalSymlinks(Rc.Dir)
+  if err != nil { Ui.Panic(err) }
+
+  Rc.Output, err = AbsWithExtend(Rc.Output)
+  if err != nil { Ui.Panic(err) }
+
+  Rc.Cache, _ = AbsWithExtend(Rc.Cache)
+  if err != nil { Ui.Panic(err) }
+  if IsNotExist(Rc.Cache) {
+	  err := os.MkdirAll(Rc.Cache, 0755)
+    if err != nil { Ui.Panic(err) }
+  }
+
 	Rc.Usertags = filepath.Join(homeConfig, "tags")
 
 	switch pflag.Arg(0) {

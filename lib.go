@@ -1,4 +1,4 @@
-package main 
+package main
 
 import (
 	"path/filepath"
@@ -27,7 +27,7 @@ func GenerateCacheTags(relName, dir, cache, mark string) error {
 	matches := re.FindAllStringSubmatch(string(data), -1)
 	for _, m := range matches {
 		id := m[1]
-		tagPattern := fmt.Sprintf("/%s%s%s", mark, id, mark) 
+		tagPattern := fmt.Sprintf("/%s%s%s", mark, id, mark)
 		tags += fmt.Sprintf("%s\t%s\t%s\n", id, absFile, tagPattern)
 	}
 
@@ -61,7 +61,7 @@ func ConcatCacheTags(cache, usertags, output string) error {
 
 	tag = fmt.Sprintf(`!_TAG_FILE_SORTED	1
 
-%s`, tag)  
+%s`, tag)
 	err = ioutil.WriteFile(output, []byte(tag), 0644)
 	if err != nil { return err }
 	return nil

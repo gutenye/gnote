@@ -1,16 +1,15 @@
-package main 
+package main
 
-import ( 
+import (
 	. "./globals/rc"
 	. "./globals/ui"
 	"os"
 	"path/filepath"
 	"github.com/howeyc/fsnotify"
-	"github.com/GutenYe/tagen.go/os2"
 )
 
 func skipFile(path string) bool {
-	// tags 
+	// tags
 	// .*
 	// backup~
 
@@ -31,16 +30,15 @@ func skipFile(path string) bool {
 }
 
 func Tags() {
-	err := os.MkdirAll(Rc.Cache, 0755)
+  err := EmptyAll(Rc.Cache)
 	if err != nil { Ui.Panic(err) }
-	err = os2.EmptyAll(Rc.Cache)
-	if err != nil { Ui.Panic(err) }
+  Pd(Rc.Dir, Rc.Cache)
 
 	// generate cache tags
 	err = filepath.Walk(Rc.Dir, func(p string, i os.FileInfo, e error) error {
-		if e != nil { return e } 
-		if skipFile(p) { 
-			return nil 
+		if e != nil { return e }
+		if skipFile(p) {
+			return nil
 		}
 
 		rel, e := filepath.Rel(Rc.Dir, p)
