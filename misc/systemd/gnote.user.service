@@ -6,4 +6,4 @@ After=local-fs.target
 ExecStart=/usr/bin/gnote watch
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
