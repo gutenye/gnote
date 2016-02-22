@@ -17,7 +17,8 @@ APP="gnote"
 PD_FILES="main.go"
 EXTRA_FILES=""
 
-RELEASE="homebrew/amd64 homebrew/386 windows/386 windows/amd64"
+#RELEASE="homebrew/amd64 homebrew/386 windows/386 windows/amd64"
+RELEASE="homebrew/amd64 homebrew/386"
 VERSION=$(sed -rn 's/.*const VERSION.*"([0-9.]+)".*/\1/p' main.go)
 declare -A OS_MAP=(
 	[homebrew]="darwin"
@@ -111,7 +112,7 @@ case $1 in
 			dist
 			package
 		done
-		upload *.zip *.tar.gz
+		#upload *.zip *.tar.gz
 		;;
 	upload )
 		shift
