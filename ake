@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+VERSION=$(cat VERSION)
+
+build() {
+  ./build.sh
+}
+
+release() {
+  #github-release --verbose release --user gutenye --repo gnote-cli --tag $VERSION
+  github-release --verbose upload --user gutenye --repo gnote-cli --tag $VERSION --name gnote.homebrew.amd64-$VERSION.tar.gz --file gnote.homebrew.amd64-$VERSION.tar.gz
+}
+
+case "$1" in
+  release ) release ;;
+  b | build ) build ;;
+esac

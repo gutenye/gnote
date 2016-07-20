@@ -18,7 +18,7 @@ PD_FILES="main.go"
 EXTRA_FILES=""
 
 #RELEASE="homebrew/amd64 homebrew/386 windows/386 windows/amd64"
-RELEASE="homebrew/amd64 homebrew/386"
+RELEASE="linux/amd64"
 VERSION=$(sed -rn 's/.*const VERSION.*"([0-9.]+)".*/\1/p' main.go)
 declare -A OS_MAP=(
 	[homebrew]="darwin"
