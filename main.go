@@ -3,15 +3,16 @@ package main
 import (
 	. "./globals/rc"
 	. "./globals/ui"
-	"os"
 	"github.com/ogier/pflag"
-	"log"
-	"launchpad.net/goyaml"
 	"io/ioutil"
+	"launchpad.net/goyaml"
+	"log"
+	"os"
 	"path/filepath"
 )
 
-const VERSION = "0.0.1"
+const VERSION = "1.0.0"
+
 var homeRc = filepath.Join(os.Getenv("HOME"), ".gnoterc")
 var homeConfig = filepath.Join(os.Getenv("HOME"), ".gnote")
 var USAGE = `$ gnote <cmd> [options]
@@ -28,7 +29,8 @@ OPTIONS
       --mark               # mark character
       --cache              # per-file tags cache directory
 `
-func main(){
+
+func main() {
 	Ui = log.New(os.Stdout, "", 0)
 	pflag.Usage = func() {
 		Ui.Print(USAGE)
@@ -46,34 +48,54 @@ func main(){
 
 	if IsExist(homeRc) {
 		d, e := ioutil.ReadFile(homeRc)
-		if e != nil { Ui.Fatal(e) }
+		if e != nil {
+			Ui.Fatal(e)
+		}
 		goyaml.Unmarshal(d, &Rc)
 	}
 	Rc.Cache = "~/.cache/gnote"
-	if *dir != "" { Rc.Dir = *dir }
-	if *output != "" { Rc.Output = *output }
-	if *cache != "" { Rc.Cache = *cache }
-	if *mark != "" { Rc.Mark = *mark }
+	if *dir != "" {
+		Rc.Dir = *dir
+	}
+	if *output != "" {
+		Rc.Output = *output
+	}
+	if *cache != "" {
+		Rc.Cache = *cache
+	}
+	if *mark != "" {
+		Rc.Mark = *mark
+	}
 
-  var err error
-  Rc.Dir, err = AbsWithExtend(Rc.Dir)
-  if err != nil { Ui.Panic(Rc.Dir) }
-  if IsNotExist(Rc.Dir) {
-    Ui.Printf("--dir `%s` does not exists", Rc.Dir)
-    os.Exit(1)
-  }
-  Rc.Dir, _ = filepath.EvalSymlinks(Rc.Dir)
-  if err != nil { Ui.Panic(err) }
+	var err error
+	Rc.Dir, err = AbsWithExtend(Rc.Dir)
+	if err != nil {
+		Ui.Panic(Rc.Dir)
+	}
+	if IsNotExist(Rc.Dir) {
+		Ui.Printf("--dir `%s` does not exists", Rc.Dir)
+		os.Exit(1)
+	}
+	Rc.Dir, _ = filepath.EvalSymlinks(Rc.Dir)
+	if err != nil {
+		Ui.Panic(err)
+	}
 
-  Rc.Output, err = AbsWithExtend(Rc.Output)
-  if err != nil { Ui.Panic(err) }
+	Rc.Output, err = AbsWithExtend(Rc.Output)
+	if err != nil {
+		Ui.Panic(err)
+	}
 
-  Rc.Cache, _ = AbsWithExtend(Rc.Cache)
-  if err != nil { Ui.Panic(err) }
-  if IsNotExist(Rc.Cache) {
-	  err := os.MkdirAll(Rc.Cache, 0755)
-    if err != nil { Ui.Panic(err) }
-  }
+	Rc.Cache, _ = AbsWithExtend(Rc.Cache)
+	if err != nil {
+		Ui.Panic(err)
+	}
+	if IsNotExist(Rc.Cache) {
+		err := os.MkdirAll(Rc.Cache, 0755)
+		if err != nil {
+			Ui.Panic(err)
+		}
+	}
 
 	Rc.Usertags = filepath.Join(homeConfig, "tags")
 
