@@ -1,11 +1,11 @@
 package main
 
 import (
-	. "./globals/rc"
-	. "./globals/ui"
+	. "github.com/gutenye/gnote-cli/globals/rc"
+	. "github.com/gutenye/gnote-cli/globals/ui"
 	"github.com/ogier/pflag"
 	"io/ioutil"
-	"launchpad.net/goyaml"
+  "gopkg.in/yaml.v1"
 	"log"
 	"os"
 	"path/filepath"
@@ -51,7 +51,7 @@ func main() {
 		if e != nil {
 			Ui.Fatal(e)
 		}
-		goyaml.Unmarshal(d, &Rc)
+		yaml.Unmarshal(d, &Rc)
 	}
 	Rc.Cache = "~/.cache/gnote"
 	if *dir != "" {

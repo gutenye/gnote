@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strings"
-	. "./globals/ui"
+	. "github.com/gutenye/gnote-cli/globals/ui"
 	"log"
 )
 

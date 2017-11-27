@@ -3,6 +3,10 @@
 VERSION=$(cat VERSION)
 
 build() {
+  go build -o gnotes
+}
+
+build-all() {
   ./build.sh
 }
 
@@ -12,6 +16,7 @@ release() {
 }
 
 case "$1" in
+  build ) build ;;
   release ) release ;;
-  b | build ) build ;;
+  build-all ) build-all ;;
 esac

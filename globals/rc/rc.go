@@ -1,7 +1,7 @@
 package globals
 
 import (
-	"../../rc"
+	"github.com/gutenye/gnote-cli/rc"
 )
 
 var Rc *rc.Rc
