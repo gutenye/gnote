@@ -1,8 +1,6 @@
 Install
 --------
 
-
-
 ```
 $ pacman -S gnote
 $ brew install gnote
@@ -13,4 +11,12 @@ $ edit ~/.gnoterc
   output: ~/tags
   mark: ∗
 
+```
+
+Development
+--------
+
+```
+$ dep ensure
+$ ./ake build
 ```
