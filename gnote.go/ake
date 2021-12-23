@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+VERSION=$(cat VERSION)
+
+publish() {
+  build
+  package
+  # upload to github release
+}
+
+
+build() {
+  mkdir -p dist
+  go build -o dist/gnote
+}
+
+package() {
+  tar zcvf macos.tar.gz -C dist  .
+}
+
+
+build-all() {
+  ./build.sh
+}
+
+case "$1" in
+  publish ) publish ;;
+  build ) build ;;
+  release ) release ;;
+  build-all ) build-all ;;
+esac

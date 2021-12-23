@@ -1,0 +1,9 @@
+[Unit]
+Description=Gnote Service
+After=local-fs.target
+
+[Service]
+ExecStart=/usr/bin/gnote watch
+
+[Install]
+WantedBy=default.target

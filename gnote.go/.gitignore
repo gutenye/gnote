@@ -1,0 +1,4 @@
+/vendor
+/testtmp
+/dist
+*.tar.gz
