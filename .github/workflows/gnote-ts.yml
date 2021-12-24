@@ -18,6 +18,7 @@ jobs:
         with:
           node-version: 16
           cache: yarn
+          cache-dependency-path: gnote.ts/yarn.lock
       - run: yarn
       - run: yarn lint
       - run: yarn test
