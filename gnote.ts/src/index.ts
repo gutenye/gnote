@@ -1,11 +1,13 @@
 import { Cli, Builtins } from 'clipanion'
-import pkg from '../package.json'
+import { readPkg } from '@/utils'
 import help from './commands/help'
 import tags from './commands/tags'
 
+const pkg = readPkg()
+
 const cli = new Cli({
-  binaryName: 'gnote',
-  binaryLabel: 'Gnote',
+  binaryName: pkg.name,
+  binaryLabel: pkg.name,
   binaryVersion: pkg.version,
 })
 
@@ -14,4 +16,4 @@ cli.register(Builtins.VersionCommand)
 cli.register(help)
 cli.register(tags)
 
-cli.runExit(process.argv.slice(2))
+void cli.runExit(process.argv.slice(2))

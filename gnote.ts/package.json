@@ -1,32 +1,43 @@
 {
-  "name": "gnote",
+  "name": "gnote.ts",
   "description": "Generate gnote tags for vim",
   "version": "0.0.1",
+  "type": "module",
   "scripts": {
-    "start": "esno src/index.ts",
+    "start": "esmo src/index.ts",
     "build": "node scripts/esbuild.js",
-    "test": "jest"
+    "lint": "eslint . --ignore-path .gitignore",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:cmd": "yarn start tags --dir testdata/note --output testdata/tags --cache testdata/cache --marker '*'"
   },
   "packageManager": "yarn@3.1.1",
   "homepage": "https://github.com/gutenye/gnote",
   "repository": "gutenye/gnote",
-  "bin": "bin/run",
   "files": [
     "bin",
     "build"
   ],
   "dependencies": {
+    "@types/lodash-es": "^4.17.5",
     "clipanion": "^3.2.0-rc.4",
-    "fs-jetpack": "^4.3.0",
-    "lodash": "^4.17.21"
+    "fast-glob": "^3.2.7",
+    "lodash-es": "^4.17.21"
   },
   "devDependencies": {
     "@types/jest": "^27.0.3",
-    "@types/lodash": "^4.14.178",
+    "@typescript-eslint/eslint-plugin": "^4.0.1",
+    "alias-hq": "^5.3.0",
     "esbuild": "^0.14.8",
     "esbuild-jest": "^0.5.0",
+    "eslint": "^7.12.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-standard-with-typescript": "^21.0.1",
+    "eslint-import-resolver-typescript": "^2.5.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1 || ^5.0.0",
     "esno": "^0.13.0",
     "jest": "^27.4.5",
-    "typescript": "^4.5.4"
+    "typescript": "^3.9 || ^4.0.0"
   }
 }

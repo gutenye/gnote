@@ -1,13 +1,15 @@
 build
 node_modules
+testdata/cache
+testdata/tags
 
 /.yarn/*
 !/.yarn/patches
 !/.yarn/plugins
 !/.yarn/releases
-#!/.yarn/sdks
+!/.yarn/sdks
 
 # Swap the comments on the following lines if you don't wish to use zero-installs
 # Documentation here: https://yarnpkg.com/features/zero-installs
-#!/.yarn/cache
+!/.yarn/cache
 #/.pnp.*

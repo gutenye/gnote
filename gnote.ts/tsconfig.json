@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": { "@/*": ["src/*"] },
+    "allowSyntheticDefaultImports": true,
+    "module": "nodenext",
+    "strictNullChecks": true,
+    "noImplicitAny": true
+  }
+}

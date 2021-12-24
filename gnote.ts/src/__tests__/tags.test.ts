@@ -1,6 +1,6 @@
-import extractTagsFromText from '../extractTagsFromText'
+import { extractTagsFromText } from '../tags'
 
-test('works', () => {
+test('extractTagsFromText', () => {
   const result = extractTagsFromText({
     text: `
 hello world

@@ -5,7 +5,7 @@ export default class Help extends Command {
 
   rest = Option.Proxy()
 
-  async execute() {
+  async execute(): Promise<void> {
     await this.cli.run([...this.rest, '--help'])
   }
 }

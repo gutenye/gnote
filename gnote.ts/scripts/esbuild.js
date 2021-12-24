@@ -1,4 +1,4 @@
-const esbuild = require('esbuild')
+import esbuild from 'esbuild'
 
 esbuild
   .build({
@@ -8,7 +8,6 @@ esbuild
     logLevel: 'info',
     target: [`node${process.versions.node}`],
     bundle: true,
-    format: 'cjs',
   })
   .catch(() => {
     process.exit(1)
