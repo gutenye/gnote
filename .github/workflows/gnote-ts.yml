@@ -1,5 +1,14 @@
 name: GnoteTs
-on: push
+
+on: 
+  push: 
+    paths:
+      - gnote-ts/**
+
+defaults:
+  run:
+    working-directory: gnote-ts
+
 jobs:
   test:
     runs-on: ubuntu-latest
