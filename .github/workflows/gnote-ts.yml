@@ -3,11 +3,11 @@ name: GnoteTs
 on: 
   push: 
     paths:
-      - gnote-ts/**
+      - gnote.ts/**
 
 defaults:
   run:
-    working-directory: gnote-ts
+    working-directory: gnote.ts
 
 jobs:
   test:
