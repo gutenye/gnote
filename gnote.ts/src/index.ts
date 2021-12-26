@@ -1,9 +1,7 @@
 import { Cli, Builtins } from 'clipanion'
-import { readPkg } from '#/utils'
 import help from './commands/help'
 import tags from './commands/tags'
-
-const pkg = readPkg()
+import pkg from '../package.json'
 
 const cli = new Cli({
   binaryName: pkg.name,

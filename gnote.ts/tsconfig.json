@@ -5,6 +5,7 @@
     "allowSyntheticDefaultImports": true,
     "module": "nodenext",
     "strictNullChecks": true,
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "resolveJsonModule": true
   }
 }
