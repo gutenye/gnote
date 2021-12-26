@@ -7,7 +7,8 @@ import {
   extractTagsFromFile,
   writeTagsToCache,
   createAllTagsFromCache,
-} from '@/tags'
+  startWatch,
+} from '#/tags'
 
 const { HOME } = process.env as { [key: string]: string }
 
@@ -64,6 +65,14 @@ export default class Tags extends Command {
       extension: this.extension,
     }
 
+    await this.createTags(context)
+
+    if (context.watch) {
+      startWatch(context)
+    }
+  }
+
+  async createTags(context: TagsContext): Promise<void> {
     await checksDir(context)
 
     await emptyCacheDir(context)

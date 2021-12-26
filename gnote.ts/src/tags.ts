@@ -1,7 +1,7 @@
 import fs from 'fs/promises'
 import glob from 'fast-glob'
 import { escapeRegExp } from 'lodash-es'
-import { exit, writeFileWithMkdir } from '@/utils'
+import { exit, writeFileWithMkdir } from '#/utils'
 
 export interface TagsContext {
   dir: string

@@ -1,5 +1,5 @@
 import { Cli, Builtins } from 'clipanion'
-import { readPkg } from '@/utils'
+import { readPkg } from '#/utils'
 import help from './commands/help'
 import tags from './commands/tags'
 

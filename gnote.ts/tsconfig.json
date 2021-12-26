@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "paths": { "@/*": ["src/*"] },
+    "paths": { "#/*": ["src/*"] },
     "allowSyntheticDefaultImports": true,
     "module": "nodenext",
     "strictNullChecks": true,
