@@ -21,8 +21,8 @@ export default class Tags extends Command {
       - \`--output\` (~/tags)
       - \`--marker\` (∗)
       - \`--cache\` (~/.cache/gnote)
-      - \`--watch\` (false)
       - \`--extension\` (.gnote)
+      - \`--watch\` (false)
       
       It will empty the cache directory first.
     `,
