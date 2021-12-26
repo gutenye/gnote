@@ -3,6 +3,8 @@
   "description": "Generate gnote tags for vim",
   "version": "1.0.0",
   "type": "module",
+  "exports": "./build/index.js",
+  "bin": "./bin/gnote.js",
   "scripts": {
     "start": "esmo src/index.ts",
     "build": "node scripts/esbuild.js",
