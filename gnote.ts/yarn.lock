@@ -3807,6 +3807,8 @@ __metadata:
     jest: ^27.4.5
     lodash-es: ^4.17.21
     typescript: ^3.9 || ^4.0.0
+  bin:
+    gnote.ts: ./bin/gnote.js
   languageName: unknown
   linkType: soft
 
