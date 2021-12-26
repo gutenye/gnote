@@ -1,5 +1,6 @@
 import fs from 'fs/promises'
 import glob from 'fast-glob'
+import chokidar from 'chokidar'
 import { escapeRegExp } from 'lodash-es'
 import { exit, writeFileWithMkdir } from '#/utils'
 
@@ -78,6 +79,14 @@ export async function writeTagsToCache(
   await writeFileWithMkdir(`${cache}/${file}`, tags)
 }
 
+export async function createTagsInCache(
+  file: string,
+  context: TagsContext
+): Promise<void> {
+  const tags = await extractTagsFromFile(file, context)
+  await writeTagsToCache(file, tags, context)
+}
+
 /**
  * create ~/tags
  */
@@ -114,7 +123,7 @@ export async function emptyCacheDir({ cache }: TagsContext): Promise<void> {
   }
 }
 
-export async function checksDir({ dir, cache }: TagsContext): Promise<void> {
+export async function checksDir({ dir }: TagsContext): Promise<void> {
   try {
     await fs.access(dir)
   } catch (err) {
@@ -123,4 +132,17 @@ export async function checksDir({ dir, cache }: TagsContext): Promise<void> {
     }
     return err
   }
+}
+
+export function startWatch(context: TagsContext): void {
+  const { dir, extension } = context
+  const watcher = chokidar.watch(`**/*${extension}`, {
+    cwd: dir,
+  })
+  watcher.on('change', async (file: string) => {
+    console.log(`Changed ${file}`)
+    await createTagsInCache(file, context)
+    await createAllTagsFromCache(context)
+  })
+  console.log('Watching for changes...')
 }

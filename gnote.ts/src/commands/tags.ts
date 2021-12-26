@@ -4,8 +4,7 @@ import {
   checksDir,
   listFiles,
   emptyCacheDir,
-  extractTagsFromFile,
-  writeTagsToCache,
+  createTagsInCache,
   createAllTagsFromCache,
   startWatch,
 } from '#/tags'
@@ -79,8 +78,7 @@ export default class Tags extends Command {
 
     const files = await listFiles(context)
     for (const file of files) {
-      const tags = await extractTagsFromFile(file, context)
-      await writeTagsToCache(file, tags, context)
+      await createTagsInCache(file, context)
     }
 
     await createAllTagsFromCache(context)
