@@ -1,13 +1,9 @@
+import fs from 'fs/promises'
+import glob from 'fast-glob'
+import chokidar from 'chokidar'
+import { escapeRegExp } from 'lodash-es'
 import { Command, Option } from 'clipanion'
-import {
-  TagsContext,
-  checksDir,
-  listFiles,
-  emptyCacheDir,
-  createTagsInCache,
-  createAllTagsFromCache,
-  startWatch,
-} from '#/tags'
+import { exit, writeFileWithMkdir } from '#/utils'
 
 const { HOME } = process.env as { [key: string]: string }
 
@@ -55,34 +51,141 @@ export default class Tags extends Command {
   })
 
   async execute(): Promise<void> {
-    const context: TagsContext = {
-      dir: this.dir,
-      output: this.output,
-      marker: this.marker,
-      cache: this.cache,
-      watch: this.watch,
-      extension: this.extension,
-    }
+    await this.createTags()
 
-    await this.createTags(context)
-
-    if (context.watch) {
-      startWatch(context)
+    if (this.watch) {
+      this.startWatch()
     }
   }
 
-  async createTags(context: TagsContext): Promise<void> {
-    await checksDir(context)
+  async createTags(): Promise<void> {
+    await this.checksDir()
 
-    await emptyCacheDir(context)
+    await this.emptyCacheDir()
 
-    const files = await listFiles(context)
+    const files = await this.listFiles()
     for (const file of files) {
-      await createTagsInCache(file, context)
+      await this.createTagsInCache(file)
     }
 
-    await createAllTagsFromCache(context)
+    await this.createAllTagsFromCache()
 
-    console.log(`Created ${context.output}`)
+    console.log(`Created ${this.output}`)
   }
+
+  async checksDir(): Promise<void> {
+    try {
+      await fs.access(this.dir)
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        exit(`Note directory not found: '${this.dir}'`)
+      }
+      return err
+    }
+  }
+
+  /**
+   * Empty ~/.cache/gnote directory
+   */
+  async emptyCacheDir(): Promise<void> {
+    const files = await fs.readdir(this.cache)
+    for (const file of files) {
+      await fs.rm(`${this.cache}/${file}`, { recursive: true })
+    }
+  }
+
+  /**
+   * List **\/*.gnote
+   */
+  async listFiles(): Promise<string[]> {
+    return await glob(`**/*${this.extension}`, { cwd: this.dir })
+  }
+
+  async createTagsInCache(file: string): Promise<void> {
+    const tags = await this.extractTagsFromFile(file)
+    await this.writeTagsToCache(file, tags)
+  }
+
+  /**
+   * read a.gnote and return tags format
+   */
+  async extractTagsFromFile(file: string): Promise<string> {
+    const fullFile = `${this.dir}/${file}`
+    const text = await fs.readFile(fullFile, 'utf8')
+    return extractTagsFromText({ text, path: fullFile, marker: this.marker })
+  }
+
+  /**
+   * Create ~/.cache/gnote/a.gnote
+   */
+  async writeTagsToCache(file: string, tags: string): Promise<void> {
+    if (tags === '') {
+      return
+    }
+    await writeFileWithMkdir(`${this.cache}/${file}`, tags)
+  }
+
+  /**
+   * create ~/tags
+   */
+  async createAllTagsFromCache(): Promise<void> {
+    const files = await glob(`${this.cache}/**/*${this.extension}`)
+    let allTags = ''
+    for (const file of files) {
+      const tags = await fs.readFile(file, 'utf8')
+      allTags += `\n${tags}`
+    }
+    allTags = sortTags(allTags)
+    const result = `!_TAG_FILE_SORTED	1\n${allTags}`
+    await writeFileWithMkdir(this.output, result)
+  }
+
+  startWatch(): void {
+    const watcher = chokidar.watch(`**/*${this.extension}`, {
+      cwd: this.dir,
+    })
+    watcher.on('change', async function (file: string) {
+      console.log(`Changed ${file}`)
+      await this.createTagsInCache(file)
+      await this.createAllTagsFromCache()
+    })
+    console.log('Watching for changes...')
+  }
+}
+
+/**
+ * Read text and returns tags format
+ *
+ * Tags Format
+ *   hello	/path/hello.gnote /∗hello∗
+ */
+export function extractTagsFromText({
+  text,
+  path,
+  marker,
+}: {
+  text: string
+  path: string
+  marker: string
+}): string {
+  const pattern = new RegExp(
+    `${escapeRegExp(marker)}([^\n ]+)${escapeRegExp(marker)}`,
+    'g'
+  )
+  const matches = text.matchAll(pattern)
+  const ids = Array.from(matches).map((v) => v[1])
+  const tags = ids
+    .map((id) => {
+      const jump = `/${marker}${id}${marker}`
+      return `${id}\t${path}\t${jump}`
+    })
+    .join('\n')
+  return tags
+}
+
+function sortTags(text: string): string {
+  return text
+    .split(/\n/)
+    .sort((a, b) => a.localeCompare(b))
+    .join('\n')
 }
