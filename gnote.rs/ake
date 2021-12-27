@@ -2,5 +2,5 @@
 
 case "$1" in 
 	test:cmd ) cargo run tags --dir testdata/note --output testdata/tags --cache testdata/cache --marker '*' ;;
-	* ) shift; cargo run -- "$@" ;;
+	* ) cargo run -- "$@" ;;
 esac

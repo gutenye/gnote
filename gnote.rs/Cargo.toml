@@ -6,3 +6,4 @@ edition = "2021"
 
 [dependencies]
 clap = { version = "3.0.0-rc.8", features = ["derive"] }
+shellexpand = "2.1"
