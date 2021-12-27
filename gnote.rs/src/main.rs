@@ -1,5 +1,3 @@
-#![feature(path_try_exists)]
-
 mod commands;
 
 use clap::{Parser, Subcommand};

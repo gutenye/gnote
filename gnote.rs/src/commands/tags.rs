@@ -1,5 +1,7 @@
 use clap::Args;
 use std::fs;
+use std::path::Path;
+use std::process;
 
 /// Generate tags file
 #[derive(Args, Debug)]
@@ -39,9 +41,9 @@ impl Tags {
 	}
 
 	fn check_dirs(&self) {
-		println!("{}", self.dir);
-		// fs::try_exists(&self.dir).expect("Error");
-		fs::try_exists("/tmp/a/adsfoadf/afdaf").expect("Error");
-		// .expect(format!("Note directory not found: '{dir}'", dir = self.dir).as_str());
+		if !Path::new(&self.dir).exists() {
+			eprintln!("Note directory not found: '{}'", self.dir);
+			process::exit(1);
+		}
 	}
 }
