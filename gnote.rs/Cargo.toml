@@ -1,0 +1,8 @@
+[package]
+name = "gnote"
+description = "Generate gnote tags for vim"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "3.0.0-rc.8", features = ["derive"] }
