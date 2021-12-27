@@ -3,7 +3,7 @@ import glob from 'fast-glob'
 import chokidar from 'chokidar'
 import { escapeRegExp } from 'lodash-es'
 import { Command, Option } from 'clipanion'
-import { exit, writeFileWithMkdir } from '#/utils'
+import { exit, writeFileWithMkdir, emptyDir } from '#/utils'
 
 const { HOME } = process.env as { [key: string]: string }
 
@@ -88,10 +88,8 @@ export default class Tags extends Command {
    * Empty ~/.cache/gnote directory
    */
   async emptyCacheDir(): Promise<void> {
-    const files = await fs.readdir(this.cache)
-    for (const file of files) {
-      await fs.rm(`${this.cache}/${file}`, { recursive: true })
-    }
+    await fs.mkdir(this.cache, { recursive: true })
+    await emptyDir(this.cache)
   }
 
   /**
