@@ -1,0 +1,1 @@
+A quick programming language syntax comparision.
