@@ -1,0 +1,20 @@
+name: GnoteRs
+
+on: 
+  push: 
+    paths:
+      - gnote.rs/**
+
+defaults:
+  run:
+    working-directory: gnote.rs
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+	    - uses: actions-rs/toolchain@v1
+			- uses: actions-rs/cargo@v1
+        with:
+          command: test
