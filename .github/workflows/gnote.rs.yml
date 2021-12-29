@@ -15,6 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
-      - uses: actions-rs/cargo@v1
         with:
-          command: test
+          toolchain: stable
+      - run: cargo test
