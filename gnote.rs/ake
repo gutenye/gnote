@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 case "$1" in 
-	test:cmd ) cargo run tags --dir testdata/note --output testdata/tags --cache testdata/cache --marker '*' ;;
+	t | test ) cargo test ;;
+	test:cmd ) cargo run tags --note_dir testdata/note --note_marker '*' --note_extension '.gnote' --output testdata/tags --cache_dir testdata/cache ;;
 	* ) cargo run -- "$@" ;;
 esac
