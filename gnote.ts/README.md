@@ -17,3 +17,7 @@ yarn
 ./ake test
 ./ake test:cmd
 ```
+
+## Todo
+
+- watch create, rename, remove event
