@@ -13,4 +13,4 @@ Same cli app written in Typescript, Rust and Go
 | Go         |            |                    |         |
 
 - Run with `time <cmd> -h`
-- See syntax comparision in lang folder. 
+- See [Language Syntax Comparision](https://github.dev/gutenye/gnote/tree/main/lang)
