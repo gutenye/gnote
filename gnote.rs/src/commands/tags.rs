@@ -59,24 +59,23 @@ impl Tags {
 	}
 
 	pub fn execute(&self) {
-		// println!("{:?}", self);
 		self.create_tags();
 	}
 
 	/// Create tags file
 	fn create_tags(&self) {
-		// self.check_dirs();
+		self.check_dirs();
 
-		// self.empty_cache_dir();
+		self.empty_cache_dir();
 
 		let note_paths = self.list_notes();
 		for note_path in note_paths {
 			self.create_tags_in_cache(&note_path)
 		}
 
-		// await this.createAllTagsFromCache()
+		self.create_all_tags_from_cache();
 
-		// console.log(`Created ${this.output}`)
+		println!("Created {}", self.output.display());
 	}
 
 	/// Make sure note directory exists
@@ -124,7 +123,7 @@ impl Tags {
 
 	/// Read <note>/a.gnote and returns tags content
 	fn extract_tags_from_file(&self, note_path: &Path) -> String {
-		let full_node_path = Path::new(&self.note_dir).join(note_path);
+		let full_node_path = &self.note_dir.join(note_path);
 		let content = fs::read_to_string(&full_node_path).expect(&format!(
 			"Failed to read file: {}",
 			full_node_path.display()
@@ -136,7 +135,32 @@ impl Tags {
 		if tags_content.is_empty() {
 			return;
 		}
-		write_with_create_dir(&self.cache_dir.join(note_path), tags_content)
+		let full_note_cache_path = self.cache_dir.join(note_path);
+		utils::write_with_create_dir(&full_note_cache_path, tags_content).expect(&format!(
+			"Failed to write tags to cache: {}",
+			note_path.display()
+		));
+	}
+
+	fn create_all_tags_from_cache(&self) {
+		let paths = glob(&format!(
+			"{}/**/*{}",
+			self.cache_dir.to_string_lossy(),
+			self.note_extension
+		))
+		.unwrap();
+		let mut all_tags_content = String::new();
+		for path in paths {
+			let path = path.unwrap();
+			let tags_content = fs::read_to_string(&path).unwrap();
+			all_tags_content.push_str(&format!("\n{}", &tags_content));
+		}
+		let all_tags_content = sort_tags(&all_tags_content);
+		let result = format!("!_TAG_FILE_SORTED\t1\n{}", &all_tags_content);
+		utils::write_with_create_dir(&self.output, &result).expect(&format!(
+			"Failed to write tags to file: {}",
+			self.output.display()
+		));
 	}
 }
 
@@ -189,8 +213,8 @@ mod tests {
 	}
 }
 
-fn write_with_create_dir(path: &Path, content: &str) {
-	let dir = path.parent().unwrap();
-	fs::create_dir_all(dir).expect(&format!("Failed to create dir: {}", dir.display()));
-	fs::write(path, content);
+fn sort_tags(tags_content: &str) -> String {
+	let mut lines: Vec<_> = tags_content.lines().collect();
+	lines.sort();
+	lines.join("\n")
 }
