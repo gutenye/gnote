@@ -1,9 +1,15 @@
 name: ReleaseRs
 
 on:
-	push:
-		tags: 
-			- "rs*.*.*"
+  push:
+    paths:
+      - gnote.rs/**
+    tags: 
+      - "rs*.*.*"
+
+defaults:
+  run:
+    working-directory: gnote.rs
 
 jobs:
   test:
@@ -13,9 +19,9 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-			- uses: Swatinem/rust-cache@v1
-				with:
-					working-directory: 
+      - uses: Swatinem/rust-cache@v1
+        with:
+          working-directory: gnote.rs
       - run: cargo build --release && mv target/release/gnote target/release/gnote.ts-macos-arm64-v1.0.0
       - uses: softprops/action-gh-release@v1
         with:
