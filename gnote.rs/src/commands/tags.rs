@@ -71,7 +71,7 @@ impl Tags {
 
 		let note_paths = self.list_notes();
 		for note_path in note_paths {
-			self.create_tags_in_cache(note_path)
+			self.create_tags_in_cache(&note_path)
 		}
 
 		// await this.createAllTagsFromCache()
@@ -117,19 +117,26 @@ impl Tags {
 	}
 
 	/// Create <cache>/a.gnote
-	fn create_tags_in_cache(&self, note_path: PathBuf) {
+	fn create_tags_in_cache(&self, note_path: &Path) {
 		let tags_content = self.extract_tags_from_file(note_path);
-		// self.write_tags_to_cache(note_path, tags_content);
+		self.write_tags_to_cache(note_path, &tags_content);
 	}
 
 	/// Read <note>/a.gnote and returns tags content
-	fn extract_tags_from_file(&self, note_path: PathBuf) -> String {
+	fn extract_tags_from_file(&self, note_path: &Path) -> String {
 		let full_node_path = Path::new(&self.note_dir).join(note_path);
 		let content = fs::read_to_string(&full_node_path).expect(&format!(
 			"Failed to read file: {}",
 			full_node_path.display()
 		));
-		extract_tags_from_text(content, full_node_path, &self.note_marker, &self.pattern)
+		extract_tags_from_text(&content, &full_node_path, &self.note_marker, &self.pattern)
+	}
+
+	fn write_tags_to_cache(&self, note_path: &Path, tags_content: &str) {
+		if tags_content.is_empty() {
+			return;
+		}
+		write_with_create_dir(&self.cache_dir.join(note_path), tags_content)
 	}
 }
 
@@ -137,12 +144,7 @@ fn create_pattern(note_marker: &str) -> Regex {
 	Regex::new(&format!(r"{0}([^\s]+){0}", regex::escape(&note_marker))).unwrap()
 }
 
-fn extract_tags_from_text(
-	text: String,
-	path: PathBuf,
-	note_marker: &str,
-	pattern: &Regex,
-) -> String {
+fn extract_tags_from_text(text: &str, path: &Path, note_marker: &str, pattern: &Regex) -> String {
 	let ids: Vec<&str> = pattern
 		.captures_iter(&text)
 		.map(|cap| cap.get(1).unwrap().as_str())
@@ -172,9 +174,8 @@ mod tests {
 				foo *bar*
 				link step
 				*baz* and 
-			"
-			.to_string(),
-			PathBuf::from("/a.gnote"),
+			",
+			Path::new("/a.gnote"),
 			"*",
 			&create_pattern("*"),
 		);
@@ -186,4 +187,10 @@ mod tests {
 			"
 		)
 	}
+}
+
+fn write_with_create_dir(path: &Path, content: &str) {
+	let dir = path.parent().unwrap();
+	fs::create_dir_all(dir).expect(&format!("Failed to create dir: {}", dir.display()));
+	fs::write(path, content);
 }
