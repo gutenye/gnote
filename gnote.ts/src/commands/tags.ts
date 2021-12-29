@@ -63,9 +63,9 @@ export default class Tags extends Command {
 
     await this.emptyCacheDir()
 
-    const files = await this.listFiles()
-    for (const file of files) {
-      await this.createTagsInCache(file)
+    const notes = await this.listNotes()
+    for (const note of notes) {
+      await this.createTagsInCache(note)
     }
 
     await this.createAllTagsFromCache()
@@ -95,20 +95,23 @@ export default class Tags extends Command {
   /**
    * List **\/*.gnote
    */
-  async listFiles(): Promise<string[]> {
+  async listNotes(): Promise<string[]> {
     return await glob(`**/*${this.extension}`, { cwd: this.dir })
   }
 
-  async createTagsInCache(file: string): Promise<void> {
-    const tags = await this.extractTagsFromFile(file)
-    await this.writeTagsToCache(file, tags)
+  /**
+   * Create <cacheDir>/a.gnote
+   */
+  async createTagsInCache(note: string): Promise<void> {
+    const tags = await this.extractTagsFromFile(note)
+    await this.writeTagsToCache(note, tags)
   }
 
   /**
-   * read a.gnote and return tags format
+   * read <noteDir>/a.gnote and return tags content
    */
-  async extractTagsFromFile(file: string): Promise<string> {
-    const fullFile = `${this.dir}/${file}`
+  async extractTagsFromFile(note: string): Promise<string> {
+    const fullFile = `${this.dir}/${note}`
     const text = await fs.readFile(fullFile, 'utf8')
     return extractTagsFromText({ text, path: fullFile, marker: this.marker })
   }
@@ -116,11 +119,11 @@ export default class Tags extends Command {
   /**
    * Create ~/.cache/gnote/a.gnote
    */
-  async writeTagsToCache(file: string, tags: string): Promise<void> {
+  async writeTagsToCache(note: string, tags: string): Promise<void> {
     if (tags === '') {
       return
     }
-    await writeFileWithMkdir(`${this.cache}/${file}`, tags)
+    await writeFileWithMkdir(`${this.cache}/${note}`, tags)
   }
 
   /**
