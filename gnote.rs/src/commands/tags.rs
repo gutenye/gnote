@@ -11,30 +11,28 @@ use std::process;
 #[derive(Args, Debug)]
 pub struct TagsContext {
 	/// Note directory
-	#[clap(long, default_value_t = String::from(tilde("~/env/note")))]
+	#[clap(long="note-dir", default_value_t=String::from(tilde("~/env/note")))]
 	note_dir: String,
 
 	/// Note extension
-	#[clap(long, default_value_t = String::from(".gnote"))]
+	#[clap(long="note-extension", default_value_t=String::from(".gnote"))]
 	note_extension: String,
 
 	/// Note marker string
-	#[clap(long, default_value_t = String::from("∗"))]
+	#[clap(long="note-marker", default_value_t=String::from("∗"))]
 	note_marker: String,
 
 	/// Ouput tags file
-	#[clap(long, default_value_t = String::from(tilde("~/tags")))]
+	#[clap(long, default_value_t=String::from(tilde("~/tags")))]
 	output: String,
 
 	/// Cache directory
-	#[clap(long, default_value_t = String::from(tilde("~/.cache/gnote")))]
+	#[clap(long="cache-dir", default_value_t=String::from(tilde("~/.cache/gnote")))]
 	cache_dir: String,
 
 	/// Watch mode
 	#[clap(long)]
 	watch: bool,
-
-	pattern: Regex,
 }
 
 pub struct Tags {
