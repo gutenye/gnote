@@ -1,11 +1,13 @@
 use crate::utils;
 use clap::Args;
 use glob::glob;
+use notify::{watcher, DebouncedEvent, RecursiveMode, Watcher};
 use regex::Regex;
 use shellexpand::tilde;
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::process;
+use std::sync::mpsc::channel;
+use std::time::Duration;
 
 /// Generate tags file
 #[derive(Args, Debug)]
@@ -58,14 +60,17 @@ impl Tags {
 		}
 	}
 
-	pub fn execute(&self) {
+	pub fn execute(&mut self) {
+		self.check_dirs();
 		self.create_tags();
+
+		if self.watch {
+			self.start_watch();
+		}
 	}
 
 	/// Create tags file
 	fn create_tags(&self) {
-		self.check_dirs();
-
 		self.empty_cache_dir();
 
 		let note_paths = self.list_notes();
@@ -79,19 +84,22 @@ impl Tags {
 	}
 
 	/// Make sure note directory exists
-	fn check_dirs(&self) {
-		if !self.note_dir.exists() {
-			eprintln!("Note directory not found: '{}'", self.note_dir.display());
-			process::exit(1);
-		}
-	}
+	fn check_dirs(&mut self) {
+		self.note_dir = self.note_dir.canonicalize().expect(&format!(
+			"Note directory not found: {}",
+			self.note_dir.display()
+		));
 
-	/// Empty cache directory
-	fn empty_cache_dir(&self) {
 		fs::create_dir_all(&self.cache_dir).expect(&format!(
 			"Failed to create cache dir: {}",
 			self.cache_dir.display()
 		));
+
+		self.cache_dir = self.cache_dir.canonicalize().unwrap();
+	}
+
+	/// Empty cache directory
+	fn empty_cache_dir(&self) {
 		utils::empty_dir(&self.cache_dir).expect(&format!(
 			"Failed to empty cache dir: {}",
 			self.cache_dir.display()
@@ -161,6 +169,64 @@ impl Tags {
 			"Failed to write tags to file: {}",
 			self.output.display()
 		));
+	}
+
+	fn start_watch(&self) {
+		println!("Watching {}", self.note_dir.display());
+		let (tx, rx) = channel();
+		let mut watcher = watcher(tx, Duration::from_secs(1)).unwrap();
+		watcher
+			.watch(&self.note_dir, RecursiveMode::Recursive)
+			.unwrap();
+		loop {
+			match rx.recv() {
+				Err(e) => println!("watch error: {:?}", e),
+				Ok(event) => match event {
+					DebouncedEvent::Write(path) | DebouncedEvent::Create(path) => self.watch_changed(&path),
+					DebouncedEvent::NoticeRemove(path) => self.watch_removed(&path),
+					DebouncedEvent::Rename(_, new) => {
+						self.watch_changed(&new);
+					}
+					_ => {}
+				},
+			}
+		}
+	}
+
+	fn watch_changed(&self, full_note_path: &Path) {
+		if !(full_note_path.is_file() && self.is_note_extension(full_note_path)) {
+			return;
+		}
+		let note_path = &self.relative_note_path(full_note_path);
+		println!("Changed: {}", note_path.display());
+		self.create_tags_in_cache(note_path);
+		self.create_all_tags_from_cache();
+	}
+
+	fn watch_removed(&self, full_note_path: &Path) {
+		if !self.is_note_extension(full_note_path) {
+			return;
+		}
+		let note_path = &self.relative_note_path(full_note_path);
+		println!("Removed: {}", note_path.display());
+		self.remove_tags_in_cache(note_path);
+	}
+
+	fn is_note_extension(&self, path: &Path) -> bool {
+		let extension = path.extension().and_then(|v| v.to_str()).unwrap_or("");
+		extension == &self.note_extension[1..]
+	}
+
+	fn relative_note_path(&self, full_note_path: &Path) -> PathBuf {
+		full_note_path
+			.strip_prefix(&self.note_dir)
+			.unwrap()
+			.to_path_buf()
+	}
+
+	fn remove_tags_in_cache(&self, note_path: &Path) {
+		let full_note_cache_path = self.cache_dir.join(note_path);
+		fs::remove_file(&full_note_cache_path).ok();
 	}
 }
 
