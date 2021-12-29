@@ -11,7 +11,7 @@ gnote.ts tags --watch
 ## Development
 
 ```
-yarn start ..
-yarn test
-yarn test:cmd
+./ake [...args]
+./ake test
+./ake test:cmd
 ```

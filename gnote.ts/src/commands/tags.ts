@@ -13,11 +13,11 @@ export default class Tags extends Command {
   static usage = Command.Usage({
     description: 'Generate tags file',
     details: `
-      - \`--dir\` (~/env/note)
+      - \`--note-dir\` (~/env/note)
+      - \`--note-marker\` (∗)
+      - \`--note-extension\` (.gnote)
       - \`--output\` (~/tags)
-      - \`--marker\` (∗)
-      - \`--cache\` (~/.cache/gnote)
-      - \`--extension\` (.gnote)
+      - \`--cache-dir\` (~/.cache/gnote)
       - \`--watch\` (false)
       
       It will empty the cache directory first.
@@ -28,22 +28,24 @@ export default class Tags extends Command {
     ],
   })
 
-  dir = Option.String('--dir', `${HOME}/env/note`, {
+  noteDir = Option.String('--note-dir', `${HOME}/env/note`, {
     description: 'Input note directory',
+  })
+
+  noteMarker = Option.String('--note-marker', '∗', {
+    description: 'Marker string',
+  })
+
+  noteExtension = Option.String('--note-extension', '.gnote', {
+    description: 'Note extension',
   })
 
   output = Option.String('--output', `${HOME}/tags`, {
     description: 'Ouput tags file',
   })
 
-  marker = Option.String('--marker', '∗', { description: 'Marker string' })
-
-  cache = Option.String('--cache', `${HOME}/.cache/gnote`, {
+  cacheDir = Option.String('--cache-dir', `${HOME}/.cache/gnote`, {
     description: 'Cache directory',
-  })
-
-  extension = Option.String('--extension', '.gnote', {
-    description: 'Note extension',
   })
 
   watch = Option.Boolean('--watch', false, {
@@ -75,10 +77,10 @@ export default class Tags extends Command {
 
   async checksDir(): Promise<void> {
     try {
-      await fs.access(this.dir)
+      await fs.access(this.noteDir)
     } catch (err) {
       if (err.code === 'ENOENT') {
-        exit(`Note directory not found: '${this.dir}'`)
+        exit(`Note directory not found: '${this.noteDir}'`)
       }
       return err
     }
@@ -88,15 +90,15 @@ export default class Tags extends Command {
    * Empty ~/.cache/gnote directory
    */
   async emptyCacheDir(): Promise<void> {
-    await fs.mkdir(this.cache, { recursive: true })
-    await emptyDir(this.cache)
+    await fs.mkdir(this.cacheDir, { recursive: true })
+    await emptyDir(this.cacheDir)
   }
 
   /**
    * List **\/*.gnote
    */
   async listNotes(): Promise<string[]> {
-    return await glob(`**/*${this.extension}`, { cwd: this.dir })
+    return await glob(`**/*${this.noteExtension}`, { cwd: this.noteDir })
   }
 
   /**
@@ -111,9 +113,13 @@ export default class Tags extends Command {
    * read <noteDir>/a.gnote and return tags content
    */
   async extractTagsFromFile(note: string): Promise<string> {
-    const fullFile = `${this.dir}/${note}`
+    const fullFile = `${this.noteDir}/${note}`
     const text = await fs.readFile(fullFile, 'utf8')
-    return extractTagsFromText({ text, path: fullFile, marker: this.marker })
+    return extractTagsFromText({
+      text,
+      path: fullFile,
+      marker: this.noteMarker,
+    })
   }
 
   /**
@@ -123,14 +129,14 @@ export default class Tags extends Command {
     if (tags === '') {
       return
     }
-    await writeFileWithMkdir(`${this.cache}/${note}`, tags)
+    await writeFileWithMkdir(`${this.cacheDir}/${note}`, tags)
   }
 
   /**
    * create ~/tags
    */
   async createAllTagsFromCache(): Promise<void> {
-    const files = await glob(`${this.cache}/**/*${this.extension}`)
+    const files = await glob(`${this.cacheDir}/**/*${this.noteExtension}`)
     let allTags = ''
     for (const file of files) {
       const tags = await fs.readFile(file, 'utf8')
@@ -142,8 +148,8 @@ export default class Tags extends Command {
   }
 
   startWatch(): void {
-    const watcher = chokidar.watch(`**/*${this.extension}`, {
-      cwd: this.dir,
+    const watcher = chokidar.watch(`**/*${this.noteExtension}`, {
+      cwd: this.noteDir,
     })
     watcher.on('change', async function (file: string) {
       console.log(`Changed ${file}`)

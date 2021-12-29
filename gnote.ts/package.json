@@ -10,7 +10,7 @@
     "build": "node scripts/esbuild.js",
     "lint": "eslint . --ignore-path .gitignore",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
-    "test:cmd": "yarn start tags --dir testdata/note --output testdata/tags --cache testdata/cache --marker '*'"
+    "test:cmd": "yarn start tags --note-dir testdata/note --output testdata/tags --cache-dir testdata/cache --note-marker '*' --note-extension .gnote"
   },
   "packageManager": "yarn@3.1.1",
   "homepage": "https://github.com/gutenye/gnote",

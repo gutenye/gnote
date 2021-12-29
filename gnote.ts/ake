@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+case "$1" in
+  "" ) yarn start ;;
+  t | test ) yarn test ;; 
+  t:cmd | test:cmd ) yarn test:cmd ;;
+esac
