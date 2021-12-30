@@ -26,6 +26,9 @@ jobs:
             platform: linux-amd64
           - os: macos-latest
             platform: macos-amd64
+          - os: macos-latest
+            platform: macos-arm64
+            target: aarch64-apple-darwin
     steps:
       - uses: actions/checkout@v2
       - name: Set VERSION
@@ -34,27 +37,27 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-        if: ${{matrix.platform}} != macos-arm64
+        if: matrix.platform != macos-arm64
       - name: Install Rust (macos-arm64)
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-          target: aarch64-apple-darwin
-        if: ${{matrix.platform}} == macos-arm64
+          target: ${{matrix.target}}
+        if: matrix.platform == macos-arm64
       - name: Cache
         uses: Swatinem/rust-cache@v1
         with:
           working-directory: ${{env.name}}
       - name: Build
         run: cargo build --release 
-        if: ${{matrix.platform}} != macos-arm64
+        if: matrix.platform != macos-arm64
       - name: Build (macos-arm64)
         run: >
           SDKROOT=$(xcrun -sdk macosx --show-sdk-path)
           MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx --show-sdk-platform-version)
-          cargo build --target=aarch64-apple-darwin &&
+          cargo build --target=${{matrix.target}} &&
           mv target/aarch64-apple-darwin/release/gnote target/release/gnote
-        if: ${{matrix.platform}} == macos-arm64
+        if: matrix.platform == macos-arm64
       - name: Upload assets
         uses: svenstaro/upload-release-action@v2
         with:
