@@ -7,13 +7,13 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - ${{env.ROOT}}/**
+      - ${{ env.ROOT }}/**
     tags: 
       - rs*.*.*
 
 defaults:
   run:
-    working-directory: ${{env.ROOT}}
+    working-directory: ${{ env.ROOT }}
 
 jobs:
   release:
