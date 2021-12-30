@@ -4,6 +4,7 @@ env:
   ROOT: gnote.rs
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - ${{env.ROOT}}/**
@@ -18,15 +19,26 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-      - uses: Swatinem/rust-cache@v1
+      - name: Cache
+        uses: Swatinem/rust-cache@v1
         with:
           working-directory: ${{env.ROOT}}
-      - run: cargo build --release && mv target/release/gnote target/release/gnote.rs-macos-arm64-v1.0.0
+      - name: Rust add more platforms
+        run: cargo target add x86_64-unknown-linux-gnu aarch64-apple-darwin x86_64-apple-darwin
+      - name: Build
+        run: |
+          cargo build --release --target x86_64-unknown-linux-gnu && mv target/x86_64-unknown-linux-gnu/release/gnote gnote.rs-linux-amd64-v1.0.0
+          cargo build --release --target aarch64-apple-darwin && mv target/aarch64-apple-darwin/gnote gnote.rs-macos-arm64-v1.0.0
+          cargo build --release --target x86_64-apple-darwin && mv target/x86_64-apple-darwin/gnote gnote.rs-macos-amd64-v1.0.0
       - uses: softprops/action-gh-release@v1
         with:
           files: |
-            ${{env.ROOT}}/target/release/gnote.rs-macos-arm64-v1.0.0
+            ${{env.ROOT}}/gnote.rs-macos-arm64-v1.0.0
+            ${{env.ROOT}}/gnote.rs-macos-amd64-v1.0.0
+            ${{env.ROOT}}/gnote.rs-linux-amd64-v1.0.0
