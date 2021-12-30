@@ -34,7 +34,6 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
-          target: aarch64-apple-darwin
         if: ${{matrix.platform}} != macos-arm64
       - name: Install Rust (macos-arm64)
         uses: actions-rs/toolchain@v1
