@@ -21,7 +21,7 @@ gnote.rs tags --watch
 ```
 vi Cargo.toml
 	version = "1.0.0"
-git commit -m 'rs chore: rs1.0.0'
+git commit -m 'rs1.0.0'
 git tag rs1.0.0
 git push --tags
 ```
