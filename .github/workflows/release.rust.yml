@@ -16,14 +16,28 @@ defaults:
     working-directory: gnote.rs
 
 jobs:
-  release:
+  create_release:
+    name: Create release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Create release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+
+  upload_assets:
+    needs: create_release 
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        os:
-          - ubuntu-latest
-          - macos-latest
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - { os: ubuntu-latest, platform: linux, arch: amd64 }
+          - { os: macos-latest, platform: macos, arch: amd64 }
     steps:
+      - name: Set VERSION
+        run: echo VERSION=${GITHUB_REF_NAME#rs} >> $GITHUB_ENV
       - name: Checkout
         uses: actions/checkout@v2
       - name: Install Rust
@@ -37,7 +51,7 @@ jobs:
       - name: Build
         run: >
           cargo build --release &&
-          mv target/release/gnote gnote.rs-linux-amd64-v1.0.0
+          mv target/release/gnote gnote.rs-${{matrix.platform}}-${{matrix.arch}}-v${{env.VERSION}}
       # - uses: softprops/action-gh-release@v1
       #   with:
       #     files: |
