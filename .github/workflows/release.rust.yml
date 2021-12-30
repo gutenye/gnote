@@ -22,13 +22,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
-            platform: linux-amd64
-          - os: macos-latest
-            platform: macos-amd64
-          - os: macos-latest
-            platform: macos-arm64
-            target: aarch64-apple-darwin
+          - { os: ubuntu-latest, platform: linux-amd64 }
+          - { os: macos-latest, platform: macos-amd64 }
+          - { os: macos-latest, platform: macos-arm64, target: aarch64-apple-darwin }
     steps:
       - uses: actions/checkout@v2
       - name: Set VERSION
@@ -55,7 +51,7 @@ jobs:
         run: >
           SDKROOT=$(xcrun -sdk macosx --show-sdk-path)
           MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx --show-sdk-platform-version)
-          cargo build --target=${{matrix.target}} &&
+          cargo build --release --target=${{matrix.target}} &&
           mv target/aarch64-apple-darwin/release/gnote target/release/gnote
         if: matrix.platform == 'macos-arm64'
       - name: Upload assets
