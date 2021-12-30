@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+
+case "$1" in 
+  actions ) act workflow_dispatch ;;
+esac

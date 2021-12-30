@@ -1,4 +1,4 @@
-name: GnoteTs
+name: Gnote (Typescript)
 
 on: 
   push: 

@@ -1,4 +1,4 @@
-name: GnoteRs
+name: Gnote (Rust)
 
 on: 
   push: 
