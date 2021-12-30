@@ -2,9 +2,7 @@
 
 Same cli app written in Typescript, Rust and Go
 
-
 ## Comparision
-
 
 | Language   | Startup Time | Single Binary size | Note    |
 |------------|--------------|--------------------|---------|
@@ -12,6 +10,7 @@ Same cli app written in Typescript, Rust and Go
 | Rust       | 0.3s         | 2.4MB              |         |
 | Go         |              |                    |         |
 
+- TODO: use hyperfine for benchmark, do cold start
 - Startup time: restart system, run with `time <cmd> -h` for the first time.
 - Single Binary size: on Apple Silicon
 - See [Language Syntax Comparision](https://github.dev/gutenye/gnote/tree/main/lang)
