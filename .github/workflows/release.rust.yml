@@ -17,7 +17,7 @@ defaults:
 
 jobs:
   release:
-    name: Release (${{matrix.os}})
+    name: Release (${{matrix.platform}})
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
@@ -26,6 +26,9 @@ jobs:
             platform: linux-amd64
           - os: macos-latest
             platform: macos-amd64
+          - os: macos-latest
+            platform: macos-arm64
+            target: aarch64-apple-darwin
     steps:
       - uses: actions/checkout@v2
       - name: Set VERSION
@@ -40,6 +43,14 @@ jobs:
           working-directory: ${{env.name}}
       - name: Build
         run: cargo build --release 
+        if: ${{matrix.platform}} != macos-arm64
+      - name: Build (macos-arm64)
+        run: >
+          SDKROOT=$(xcrun -sdk macosx --show-sdk-path)
+          MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx --show-sdk-platform-version)
+          cargo build --target=aarch64-apple-darwin &&
+          mv target/aarch64-apple-darwin/release/gnote target/release/gnote
+        if: ${{matrix.platform}} == macos-arm64
       - name: Upload assets
         uses: svenstaro/upload-release-action@v2
         with:
@@ -48,4 +59,3 @@ jobs:
           tag: ${{github.ref_name}}
           repo_token: ${{secrets.GITHUB_TOKEN}}
           release_name: ${{env.name}} v${{env.VERSION}}
-
