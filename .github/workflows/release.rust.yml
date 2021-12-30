@@ -16,30 +16,20 @@ defaults:
     working-directory: gnote.rs
 
 jobs:
-  create_release:
-    name: Create release
-    runs-on: ubuntu-latest
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-    steps:
-      - name: Create release
-        id: create_release
-        uses: softprops/action-gh-release@v1
-
-  upload_assets:
-    needs: create_release 
-    runs-on: ${{matrix.os}}
+  publish:
+    name: Publish for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest]
         include:
-          - { os: ubuntu-latest, platform: linux, arch: amd64 }
-          - { os: macos-latest, platform: macos, arch: amd64 }
+          - os: ubuntu-latest
+            platform: linux-amd64
+          - os: macos-latest
+            platform: macos-amd64
     steps:
       - name: Set VERSION
         run: echo VERSION=${GITHUB_REF_NAME#rs} >> $GITHUB_ENV
-      - name: Checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -49,10 +39,11 @@ jobs:
         with:
           working-directory: ${{env.ROOT}}
       - name: Build
-        run: >
-          cargo build --release &&
-          mv target/release/gnote gnote.rs-${{matrix.platform}}-${{matrix.arch}}-v${{env.VERSION}}
-      # - uses: softprops/action-gh-release@v1
-      #   with:
-      #     files: |
-      #       ${{env.ROOT}}/gnote.rs-macos-arm64-v1.0.0
+        run: cargo build --release 
+      - name: Upload assets
+        uses: svenstaro/upload-release-action@v2
+        with:
+          file: target/release/gnote
+          asset_name: gnote.rs-${{matrix.platform}}-v${{env.VERSION}}
+          tag: ${{github.refname}}
+
