@@ -16,9 +16,9 @@ defaults:
     working-directory: gnote.rs
 
 jobs:
-  publish:
-    name: Publish for ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+  release:
+    name: Release for ${{matrix.os}}
+    runs-on: ${{matrix.os}}
     strategy:
       matrix:
         include:
@@ -27,9 +27,9 @@ jobs:
           - os: macos-latest
             platform: macos-amd64
     steps:
+      - uses: actions/checkout@v2
       - name: Set VERSION
         run: echo VERSION=${GITHUB_REF_NAME#rs} >> $GITHUB_ENV
-      - uses: actions/checkout@v2
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
