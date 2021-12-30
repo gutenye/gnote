@@ -43,7 +43,7 @@ jobs:
       - name: Upload assets
         uses: svenstaro/upload-release-action@v2
         with:
-          file: target/release/gnote
+          file: ${{env.name}}/target/release/gnote
           asset_name: gnote.rs-${{matrix.platform}}-v${{env.VERSION}}
           tag: ${{github.ref_name}}
           repo_token: ${{secrets.GITHUB_TOKEN}}
