@@ -30,7 +30,7 @@ jobs:
         with:
           working-directory: ${{env.ROOT}}
       - name: Rust add more platforms
-        run: cargo target add x86_64-unknown-linux-gnu aarch64-apple-darwin x86_64-apple-darwin
+        run: rustup target add x86_64-unknown-linux-gnu aarch64-apple-darwin x86_64-apple-darwin
       - name: Build
         run: |
           cargo build --release --target x86_64-unknown-linux-gnu && mv target/x86_64-unknown-linux-gnu/release/gnote gnote.rs-linux-amd64-v1.0.0
