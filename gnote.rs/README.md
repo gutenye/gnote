@@ -3,6 +3,10 @@
 ## Getting Started
 
 ```
+brew install gutenye/alt/gnote.rs
+brew services info gnote.rs
+tail -f $(brew --prefix)/log/gnote.rs.log
+
 gnote.rs -h
 gnote.rs tags --note-dir ~/note --note-marker '*' --note-extension .note --output ~/tags --cache-dir ~/.cache/note
 gnote.rs tags --watch
