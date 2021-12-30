@@ -54,6 +54,8 @@ jobs:
           cargo build --release --target=${{matrix.target}} &&
           mv target/aarch64-apple-darwin/release/gnote target/release/gnote
         if: matrix.platform == 'macos-arm64'
+      - name: Give execute permission
+        run: chmod +x target/release/gnote
       - name: Upload assets
         uses: svenstaro/upload-release-action@v2
         with:
