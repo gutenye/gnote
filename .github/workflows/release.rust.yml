@@ -1,7 +1,7 @@
 name: Release (Rust)
 
 env:
-  ROOT: gnote.rs
+  name: gnote.rs
 
 on:
   workflow_dispatch:
@@ -37,7 +37,7 @@ jobs:
       - name: Cache
         uses: Swatinem/rust-cache@v1
         with:
-          working-directory: ${{env.ROOT}}
+          working-directory: ${{env.name}}
       - name: Build
         run: cargo build --release 
       - name: Upload assets
@@ -45,6 +45,7 @@ jobs:
         with:
           file: target/release/gnote
           asset_name: gnote.rs-${{matrix.platform}}-v${{env.VERSION}}
-          tag: ${{github.refname}}
+          tag: ${{github.ref_name}}
           repo_token: ${{secrets.GITHUB_TOKEN}}
+          release_name: ${{env.name}} v${{env.VERSION}}
 
