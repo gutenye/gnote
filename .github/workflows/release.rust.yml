@@ -22,9 +22,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - { os: ubuntu-latest, platform: linux-amd64 }
-          - { os: macos-latest, platform: macos-amd64 }
-          - { os: macos-latest, platform: macos-arm64, target: aarch64-apple-darwin }
+          - { os: ubuntu-latest, platform: linux-amd64, compress: true }
+          - { os: macos-latest, platform: macos-amd64, compress: true }
+          - { os: macos-latest, platform: macos-arm64, target: aarch64-apple-darwin, compress: false }
     steps:
       - uses: actions/checkout@v2
       - name: Set VERSION
@@ -45,20 +45,24 @@ jobs:
               SDKROOT=$(xcrun -sdk macosx --show-sdk-path) \
               MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx --show-sdk-platform-version) \
               cargo build --release --target=${{matrix.target}} && \
-              mv target/aarch64-apple-darwin/release/gnote target/release/gnote-${{matrix.platform}}
+              mv target/aarch64-apple-darwin/release/gnote target/release/gnote
               ;;
             * ) 
               cargo build --release  && \
-              mv target/release/gnote target/release/gnote-${{matrix.platform}}
+              mv target/release/gnote target/release/gnote
             ;;
           esac
       - name: Compress 
         uses: svenstaro/upx-action@v2
         with:
-          file: ${{env.name}}/target/release/gnote-${{matrix.platform}}
+          file: ${{env.name}}/target/release/gnote
           args: --lzma
+        if: matrix.compress
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ${{env.name}}/target/release/gnote-${{matrix.platform}}
-          tag_name: master
+          file: ${{env.name}}/target/release/gnote
+          release_name: ${{env.name}} v${{env.VERSION}} 
+          asset_name: gnote.rs-${{matrix.platform}}-v${{env.VERSION}}
+          tag: ${{github.ref_name}}
+          repo_token: ${{secrets.GITHUB_TOKEN}}
