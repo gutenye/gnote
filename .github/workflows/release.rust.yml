@@ -4,7 +4,6 @@ env:
   name: gnote.rs
 
 on:
-  workflow_dispatch:
   push:
     paths:
       - gnote.rs/**
