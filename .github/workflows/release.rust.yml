@@ -51,8 +51,11 @@ jobs:
               cargo build --release 
             ;;
           esac
-      - name: Give execute permission
-        run: chmod +x target/release/gnote
+      - name: Compress 
+        uses: svenstaro/upx-action@v2
+        with:
+          file: target/release/gnote
+          args: --lzma
       - name: Create Release
         uses: svenstaro/upload-release-action@v2
         with:
