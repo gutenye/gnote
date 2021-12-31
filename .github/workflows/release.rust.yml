@@ -58,7 +58,7 @@ jobs:
           args: --lzma
         if: matrix.compress
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: svenstaro/upload-release-action@v2
         with:
           file: ${{env.name}}/target/release/gnote
           release_name: ${{env.name}} v${{env.VERSION}} 
