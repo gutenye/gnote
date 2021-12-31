@@ -47,8 +47,7 @@ jobs:
               mv target/aarch64-apple-darwin/release/gnote target/release/gnote
               ;;
             * ) 
-              cargo build --release  && \
-              mv target/release/gnote target/release/gnote
+              cargo build --release
             ;;
           esac
       - name: Compress 
