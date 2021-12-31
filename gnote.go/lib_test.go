@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	. "github.com/gutenye/gnote/globals/ui"
+	. "github.com/gutenye/gnote/gnote.go/globals/ui"
 )
 
 func init() {

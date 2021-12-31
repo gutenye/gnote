@@ -1,14 +1,15 @@
 package main
 
 import (
-	. "github.com/gutenye/gnote/globals/rc"
-	. "github.com/gutenye/gnote/globals/ui"
-	"github.com/ogier/pflag"
 	"io/ioutil"
-  "gopkg.in/yaml.v1"
 	"log"
 	"os"
 	"path/filepath"
+
+	. "github.com/gutenye/gnote/gnote.go/globals/rc"
+	. "github.com/gutenye/gnote/gnote.go/globals/ui"
+	"github.com/ogier/pflag"
+	"gopkg.in/yaml.v1"
 )
 
 const VERSION = "1.0.0"
