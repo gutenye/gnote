@@ -13,6 +13,7 @@ main() {
 }
 
 start() {
+  cd src
   go run .
 }
 

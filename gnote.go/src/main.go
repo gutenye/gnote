@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	. "github.com/gutenye/gnote/gnote.go/globals/rc"
-	. "github.com/gutenye/gnote/gnote.go/globals/ui"
+	. "github.com/gutenye/gnote/gnote.go/src/globals/rc"
+	. "github.com/gutenye/gnote/gnote.go/src/globals/ui"
 	"github.com/ogier/pflag"
 	"gopkg.in/yaml.v1"
 )
