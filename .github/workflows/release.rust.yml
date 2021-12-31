@@ -53,7 +53,7 @@ jobs:
           esac
       - name: Give execute permission
         run: chmod +x target/release/gnote
-      - name: Upload assets
+      - name: Create Release
         uses: svenstaro/upload-release-action@v2
         with:
           file: ${{env.name}}/target/release/gnote
