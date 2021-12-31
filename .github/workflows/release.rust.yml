@@ -45,10 +45,11 @@ jobs:
               SDKROOT=$(xcrun -sdk macosx --show-sdk-path) \
               MACOSX_DEPLOYMENT_TARGET=$(xcrun -sdk macosx --show-sdk-platform-version) \
               cargo build --release --target=${{matrix.target}} && \
-              mv target/aarch64-apple-darwin/release/gnote target/release/gnote
+              mv target/aarch64-apple-darwin/release/gnote target/release/gnote-${{matrix.platform}}
               ;;
             * ) 
-              cargo build --release 
+              cargo build --release  && \
+              mv target/release/gnote target/release/gnote-${{matrix.platform}}
             ;;
           esac
       - name: Compress 
@@ -57,10 +58,6 @@ jobs:
           file: target/release/gnote
           args: --lzma
       - name: Create Release
-        uses: svenstaro/upload-release-action@v2
+        uses: softprops/action-gh-release@v1
         with:
-          file: ${{env.name}}/target/release/gnote
-          asset_name: gnote.rs-${{matrix.platform}}-v${{env.VERSION}}
-          tag: ${{github.ref_name}}
-          repo_token: ${{secrets.GITHUB_TOKEN}}
-          release_name: ${{env.name}} v${{env.VERSION}}
+          files: ${{env.name}}/target/release/gnote-${{matrix.platform}}
