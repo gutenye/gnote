@@ -24,7 +24,7 @@ pub struct TagsContext {
 	#[clap(long="note-marker", default_value_t=String::from("∗"))]
 	note_marker: String,
 
-	/// Ouput tags file
+	/// Output tags file
 	#[clap(long, default_value_t=String::from(tilde("~/tags")))]
 	output: String,
 

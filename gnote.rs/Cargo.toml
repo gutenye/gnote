@@ -1,13 +1,8 @@
-cargo-features = ["strip"]
-
 [package]
 name = "gnote"
 description = "Generate gnote tags for vim"
 version = "1.0.3"
 edition = "2021"
-
-[profile.release]
-strip = true
 
 [dependencies]
 clap = { version = "3.0.0-rc.8", features = ["derive"] }
