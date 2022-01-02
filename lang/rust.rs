@@ -1,4 +1,4 @@
-#![allow(unused)]
+#![allow(unused)] // allow unused
 
 // line comment
 /* block comment */
