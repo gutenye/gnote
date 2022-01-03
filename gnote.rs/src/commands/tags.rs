@@ -258,23 +258,19 @@ mod tests {
 
 	#[test]
 	fn test_extract_tags_from_text() {
-		let result = extract_tags_from_text(
-			"
+		let text = "
 				hello world
 				foo *bar*
 				link step
 				*baz* and 
-			",
-			Path::new("/a.gnote"),
-			"*",
-			&create_pattern("*"),
-		);
-		assert_eq!(
-			result,
-			"\
+			";
+		let result = "\
 				bar\t/a.gnote\t/*bar*\n\
 				baz\t/a.gnote\t/*baz*\
-			"
+			";
+		assert_eq!(
+			extract_tags_from_text(text, Path::new("/a.gnote"), "*", &create_pattern("*"),),
+			result,
 		)
 	}
 }
