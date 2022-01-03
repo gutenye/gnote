@@ -131,12 +131,12 @@ impl Tags {
 
 	/// Read <note>/a.gnote and returns tags content
 	fn extract_tags_from_file(&self, note_path: &Path) -> String {
-		let full_node_path = &self.note_dir.join(note_path);
-		let content = fs::read_to_string(&full_node_path).expect(&format!(
+		let full_note_path = &self.note_dir.join(note_path);
+		let content = fs::read_to_string(&full_note_path).expect(&format!(
 			"Failed to read file: {}",
-			full_node_path.display()
+			full_note_path.display()
 		));
-		extract_tags_from_text(&content, &full_node_path, &self.note_marker, &self.pattern)
+		extract_tags_from_text(&content, &full_note_path, &self.note_marker, &self.pattern)
 	}
 
 	fn write_tags_to_cache(&self, note_path: &Path, tags_content: &str) {
