@@ -1,7 +1,3 @@
 testdata/cache
 testdata/tags
-
-/vendor
-/testtmp
-/dist
 *.tar.gz

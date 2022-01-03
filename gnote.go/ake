@@ -2,9 +2,14 @@
 
 VERSION=$(cat VERSION)
 
+cmd="$1"
+shift
+
 main() {
-  case "$1" in
-    "" ) start ;;
+  case "$cmd" in
+    start ) start "$@" ;;
+    t | test ) go test ./... ;;
+    t:cmd | test:cmd ) start tags --note-dir ../testdata/note --note-marker '*' --note-extension '.gnote' --output ../testdata/tags --cache-dir ../testdata/cache "$@" ;; 
     publish ) publish ;;
     build ) build ;;
     release ) release ;;
@@ -13,8 +18,7 @@ main() {
 }
 
 start() {
-  cd src
-  go run .
+  cd src && go run . "$@"
 }
 
 publish() {

@@ -1,112 +1,33 @@
 package main
 
 import (
-	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 
-	. "github.com/gutenye/gnote/gnote.go/src/globals/rc"
-	. "github.com/gutenye/gnote/gnote.go/src/globals/ui"
-	"github.com/ogier/pflag"
-	"gopkg.in/yaml.v1"
+	"github.com/alecthomas/kong"
+	"github.com/gutenye/gnote/gnote.go/src/commands"
 )
 
-const VERSION = "1.0.0"
+var home = os.Getenv("HOME")
 
-var homeRc = filepath.Join(os.Getenv("HOME"), ".gnoterc")
-var homeConfig = filepath.Join(os.Getenv("HOME"), ".gnote")
-var USAGE = `$ gnote <cmd> [options]
+func init() {
+	if home == "" {
+		panic("$HOME is not set")
+	}
+}
 
-COMMAND:
-  tags                     # generate tags file
-  watch                    # watch note directory
-
-OPTIONS
-  -v, --version
-  -h, --help
-      --dir                # note directory
-      --output             # output 'tags' file path
-      --mark               # mark character
-      --cache              # per-file tags cache directory
-`
+var cli struct {
+	Tags commands.Tags `cmd:"" help:"Generate tags file"`
+}
 
 func main() {
-	Ui = log.New(os.Stdout, "", 0)
-	pflag.Usage = func() {
-		Ui.Print(USAGE)
-	}
-	var version = pflag.BoolP("version", "v", false, "print version number")
-	var dir = pflag.StringP("dir", "", "", "note directory")
-	var output = pflag.StringP("output", "", "", "output file")
-	var mark = pflag.StringP("mark", "", "", "mark character")
-	var cache = pflag.StringP("cache", "", "", "cahce directory")
-	pflag.Parse()
-	if *version {
-		Ui.Printf("gnote %s", VERSION)
-		os.Exit(0)
-	}
-
-	if IsExist(homeRc) {
-		d, e := ioutil.ReadFile(homeRc)
-		if e != nil {
-			Ui.Fatal(e)
-		}
-		yaml.Unmarshal(d, &Rc)
-	}
-	Rc.Cache = "~/.cache/gnote"
-	if *dir != "" {
-		Rc.Dir = *dir
-	}
-	if *output != "" {
-		Rc.Output = *output
-	}
-	if *cache != "" {
-		Rc.Cache = *cache
-	}
-	if *mark != "" {
-		Rc.Mark = *mark
-	}
-
-	var err error
-	Rc.Dir, err = AbsWithExtend(Rc.Dir)
-	if err != nil {
-		Ui.Panic(Rc.Dir)
-	}
-	if IsNotExist(Rc.Dir) {
-		Ui.Printf("--dir `%s` does not exists", Rc.Dir)
-		os.Exit(1)
-	}
-	Rc.Dir, _ = filepath.EvalSymlinks(Rc.Dir)
-	if err != nil {
-		Ui.Panic(err)
-	}
-
-	Rc.Output, err = AbsWithExtend(Rc.Output)
-	if err != nil {
-		Ui.Panic(err)
-	}
-
-	Rc.Cache, _ = AbsWithExtend(Rc.Cache)
-	if err != nil {
-		Ui.Panic(err)
-	}
-	if IsNotExist(Rc.Cache) {
-		err := os.MkdirAll(Rc.Cache, 0755)
-		if err != nil {
-			Ui.Panic(err)
-		}
-	}
-
-	Rc.Usertags = filepath.Join(homeConfig, "tags")
-
-	switch pflag.Arg(0) {
-	case "tags":
-		Tags()
-	case "watch":
-		Tags()
-		Watch()
-	default:
-		pflag.Usage()
-	}
+	ctx := kong.Parse(&cli, kong.Vars{
+		"noteDir":       filepath.Join(home, "env/note"),
+		"noteExtension": ".gnote",
+		"noteMarker":    "∗",
+		"output":        filepath.Join(home, "tags"),
+		"cacheDir":      filepath.Join(home, ".cache/gnote"),
+	})
+	err := ctx.Run()
+	ctx.FatalIfErrorf(err)
 }
