@@ -166,7 +166,7 @@ impl Tags {
 		let all_tags_content = sort_tags(&all_tags_content);
 		let result = format!("!_TAG_FILE_SORTED\t1\n{}", &all_tags_content);
 		utils::write_with_create_dir(&self.output, &result).expect(&format!(
-			"Failed to write tags to file: {}",
+			"Failed to write tags: {}",
 			self.output.display()
 		));
 	}
@@ -267,9 +267,14 @@ mod tests {
 		let result = "\
 				bar\t/a.gnote\t/*bar*\n\
 				baz\t/a.gnote\t/*baz*\
-			";
+			"
 		assert_eq!(
-			extract_tags_from_text(text, Path::new("/a.gnote"), "*", &create_pattern("*"),),
+		extract_tags_from_text(
+			text,
+			Path::new("/a.gnote"),
+			"*",
+			&create_pattern("*"),
+		),
 			result,
 		)
 	}
