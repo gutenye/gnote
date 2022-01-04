@@ -1,0 +1,51 @@
+name: Release (Go)
+
+env:
+  name: gnote.go
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - gnote.go/**
+    tags: 
+      - go*.*.*
+
+defaults:
+  run:
+    working-directory: gnote.go
+
+jobs:
+  release:
+    name: Release (${{matrix.platform}})
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix:
+        include:
+          - { os: ubuntu-latest, platform: linux-amd64, goos: linux, goarch: amd64 }
+          - { os: macos-latest, platform: macos-amd64, goos: darwin, goarch: amd64 }
+          - { os: macos-latest, platform: macos-arm64, goos: darwin, goarch: arm64  }
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set VERSION
+        run: echo VERSION=${GITHUB_REF_NAME#go} >> $GITHUB_ENV
+      - uses: actions/setup-go@v2
+      - name: Build
+        run: cd src && go build -ldflags "-s -w" -o ../gnote
+        env:
+          GOOS: ${{matrix.goos}}
+          GOARCH: ${{matrix.goarch}}
+      - name: Compress 
+        uses: svenstaro/upx-action@v2
+        with:
+          file: ${{env.name}}/gnote
+          args: --lzma
+        if: matrix.compress
+      - name: Create Release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          file: ${{env.name}}/gnote
+          release_name: ${{env.name}} v${{env.VERSION}} 
+          asset_name: ${{env.name}}-${{matrix.platform}}-v${{env.VERSION}}
+          tag: ${{github.ref_name}}
+          repo_token: ${{secrets.GITHUB_TOKEN}}
