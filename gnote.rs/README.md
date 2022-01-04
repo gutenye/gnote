@@ -30,3 +30,18 @@ git commit -m 'rs1.0.0'
 git tag rs1.0.0
 git push --tags
 ```
+
+## Test
+
+```
+./ake test:cmd
+cd testdata/note
+mkdir -p a
+echo '*1*' > a/f
+echo '*a*' > a/f.gnote
+mv a/f.gnote a/f2.gnote
+rm a/f2.gnote
+echo '*a*' > a/f.gnote
+mv a b
+rm -r b
+```

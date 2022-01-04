@@ -73,7 +73,7 @@ impl Tags {
 	fn create_tags(&self) {
 		self.empty_cache_dir();
 
-		let note_paths = self.list_notes();
+		let note_paths = self.list_notes(&self.note_dir);
 		for note_path in note_paths {
 			self.create_tags_in_cache(&note_path)
 		}
@@ -106,10 +106,10 @@ impl Tags {
 		));
 	}
 
-	fn list_notes(&self) -> Vec<PathBuf> {
+	fn list_notes(&self, dir: &PathBuf) -> Vec<PathBuf> {
 		glob(&format!(
 			"{}/**/*{}",
-			self.note_dir.to_string_lossy(),
+			dir.to_string_lossy(),
 			self.note_extension
 		))
 		.unwrap()
@@ -192,22 +192,34 @@ impl Tags {
 	}
 
 	fn watch_changed(&self, full_note_path: &Path) {
-		if !(full_note_path.is_file() && self.is_note_extension(full_note_path)) {
+		println!("Changed: {}", full_note_path.display());
+		let note_paths: Vec<PathBuf>;
+		if full_note_path.is_dir() {
+			note_paths = self.list_notes(&full_note_path.to_path_buf())
+		} else if self.is_note_file(full_note_path) {
+			let note_path = self.relative_note_path(full_note_path);
+			note_paths = vec![note_path]
+		} else {
 			return;
 		}
-		let note_path = &self.relative_note_path(full_note_path);
-		println!("Changed: {}", note_path.display());
-		self.create_tags_in_cache(note_path);
+		for note_path in note_paths {
+			self.create_tags_in_cache(&note_path);
+		}
 		self.create_all_tags_from_cache();
 	}
 
 	fn watch_removed(&self, full_note_path: &Path) {
-		if !self.is_note_extension(full_note_path) {
-			return;
-		}
 		let note_path = &self.relative_note_path(full_note_path);
-		println!("Removed: {}", note_path.display());
-		self.remove_tags_in_cache(note_path);
+		println!("Removed: {}", full_note_path.display());
+		self.remove_cache(note_path);
+		self.create_all_tags_from_cache();
+	}
+
+	fn is_note_file(&self, path: &Path) -> bool {
+		if path.is_file() && self.is_note_extension(path) {
+			return true;
+		}
+		return false;
 	}
 
 	fn is_note_extension(&self, path: &Path) -> bool {
@@ -222,9 +234,9 @@ impl Tags {
 			.to_path_buf()
 	}
 
-	fn remove_tags_in_cache(&self, note_path: &Path) {
+	fn remove_cache(&self, note_path: &Path) {
 		let full_note_cache_path = self.cache_dir.join(note_path);
-		fs::remove_file(&full_note_cache_path).ok();
+		utils::remove_all(&full_note_cache_path).ok();
 	}
 }
 

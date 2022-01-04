@@ -2,7 +2,7 @@
 
 case "$1" in 
 	t | test ) cargo test ;;
-	t:cmd | test:cmd ) shift; cargo run tags --note-dir testdata/note --note-marker '*' --note-extension '.gnote' --output testdata/tags --cache-dir testdata/cache "$@" ;;
+	t:cmd | test:cmd ) shift; cargo run tags --note-dir testdata/note --note-marker '*' --note-extension '.gnote' --output testdata/tags --cache-dir testdata/cache --watch "$@" ;;
 	build ) cargo build --release ;;
 	* ) cargo run -- "$@" ;;
 esac
