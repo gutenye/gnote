@@ -1,22 +1,14 @@
-## Install
+## Getting Started
 
 ```
-edit ~/.gnoterc
-  dir: ~/note
-  output: ~/tags
-  mark: ∗
+brew install gutenye/alt/gnote.go
+brew services info gnote.go
+tail -f $(brew --prefix)/log/gnote.go.log
 
-
-# macOS
-brew install gutenye/alt-gnote
-brew start  gnote
-tail -f /usr/local/var/log/gnote.log
-
-# Linux
-pacman -S gnote
-
-# From source
-go get -u github.com/gutenye/gnote/gnote.go
+gnote.go -h
+gnote.go tags
+gnote.go tags --watch
+gnote.go tags --note-dir ~/note --note-marker '*' --note-extension .note --output ~/tags --cache-dir ~/.cache/note
 
 # Fix bad file descriptor
 launchctl limit maxfiles 90000
@@ -26,11 +18,16 @@ Restart system
 ## Development
 
 ```
-go get -u github.com/gutenye/gnote/gnote.go
-cd ~/go/src/github.com/gutenye/gnote/gnote.go
-dep ensure
-go run .
-./ake build
+./ake [...args]
+./ake test
+./ake test:cmd
+```
+
+## Release
+
+```
+git tag go1.0.0
+git push --tags
 ```
 
 ## Test
