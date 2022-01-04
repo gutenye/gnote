@@ -2,8 +2,11 @@ package utils
 
 import (
 	"io/fs"
+	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/fsnotify/fsnotify"
 )
 
 func EmptyDir(dir string) error {
@@ -27,4 +30,59 @@ func WriteFileWithMkdirAll(path string, data []byte, perm fs.FileMode) error {
 		return err
 	}
 	return os.WriteFile(path, data, perm)
+}
+
+func WatchDir(dir string, handleEvent func(fsnotify.Event)) {
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		log.Fatalln("Failed to start watcher.", err)
+	}
+	defer watcher.Close()
+
+	err = filepath.WalkDir(dir, func(path string, dirEntry fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if dirEntry.IsDir() {
+			return watcher.Add(path)
+		}
+		return nil
+	})
+
+	if err != nil {
+		log.Fatalln("Failed to walk dir.", err)
+	}
+
+	done := make(chan bool)
+	go func() {
+		for {
+			select {
+			case event, ok := <-watcher.Events:
+				if !ok {
+					return
+				}
+				if event.Op&fsnotify.Create == fsnotify.Create {
+					if stat, _ := os.Stat(event.Name); stat.IsDir() {
+						watcher.Add(event.Name)
+					}
+				}
+				handleEvent(event)
+			case err, ok := <-watcher.Errors:
+				if !ok {
+					return
+				}
+				log.Println("watch error.", err)
+			}
+		}
+	}()
+
+	<-done
+}
+
+func RelPath(path, base string) string {
+	result, err := filepath.Rel(base, path)
+	if err != nil {
+		log.Fatalln("relpath failed.", err)
+	}
+	return result
 }

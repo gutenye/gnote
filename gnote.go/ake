@@ -9,7 +9,7 @@ main() {
   case "$cmd" in
     start ) start "$@" ;;
     t | test ) go test ./... ;;
-    t:cmd | test:cmd ) start tags --note-dir ../testdata/note --note-marker '*' --note-extension '.gnote' --output ../testdata/tags --cache-dir ../testdata/cache "$@" ;; 
+    t:cmd | test:cmd ) start tags --note-dir ../testdata/note --note-marker '*' --note-extension '.gnote' --output ../testdata/tags --cache-dir ../testdata/cache --watch "$@" ;; 
     publish ) publish ;;
     build ) build ;;
     release ) release ;;
