@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -20,11 +19,6 @@ func EmptyDir(dir string) error {
 		}
 	}
 	return nil
-}
-
-func PrintfAndExit(format string, a ...interface{}) {
-	fmt.Printf(format, a...)
-	os.Exit(1)
 }
 
 func WriteFileWithMkdirAll(path string, data []byte, perm fs.FileMode) error {

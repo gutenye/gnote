@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -34,20 +35,21 @@ func (t *Tags) Run() error {
 	t.checkDirs()
 	t.createTags()
 
-	// if self.watch {
-	// 	self.start_watch();
-	// }
+	if t.Watch {
+		t.startWatch()
+	}
+
 	return nil
 }
 
 // Make sure note directory exists
 func (t *Tags) checkDirs() {
 	if _, err := os.Stat(t.NoteDir); os.IsNotExist(err) {
-		utils.PrintfAndExit("Note directory not found: %s\n", t.NoteDir)
+		log.Fatalf("Note directory not found. %s\n", err)
 	}
 
 	if err := os.MkdirAll(t.CacheDir, 0755); err != nil {
-		utils.PrintfAndExit("Failed to create cache dir: %s\n%s\n", t.CacheDir, err)
+		log.Fatalf("Failed to create cache dir. %s\n", err)
 	}
 }
 
@@ -69,7 +71,7 @@ func (t *Tags) createTags() {
 func (t *Tags) emptyCacheDir() {
 	err := utils.EmptyDir(t.CacheDir)
 	if err != nil {
-		utils.PrintfAndExit("Failed to empty cache dir: %s\n%s\n", t.CacheDir, err)
+		log.Fatal("Failed to empty cache dir. %s\n", err)
 	}
 }
 
@@ -77,7 +79,7 @@ func (t *Tags) listNotes() []string {
 	pattern := fmt.Sprintf("%s/**/*%s", t.NoteDir, t.NoteExtension)
 	files, err := filepathx.Glob(pattern)
 	if err != nil {
-		utils.PrintfAndExit("Failed to list notes: %s\n%s\n", pattern, err)
+		log.Fatalf("Failed to list notes. %s\n", err)
 	}
 	notes := []string{}
 	for _, v := range files {
@@ -97,11 +99,11 @@ func (t *Tags) createTagsInCache(notePath string) {
 func (t *Tags) extractTagsFromFile(notePath string) string {
 	fullNotePath, err := filepath.Abs(filepath.Join(t.NoteDir, notePath))
 	if err != nil {
-		utils.PrintfAndExit("Failed to get absolute path: %s\n%s\n", fullNotePath, err)
+		log.Fatalf("Failed to get absolute path. %s\n", err)
 	}
 	content, err := os.ReadFile(fullNotePath)
 	if err != nil {
-		utils.PrintfAndExit("Failed to read note: %s\n%s\n", fullNotePath, err)
+		log.Fatalf("Failed to read file. %s\n", err)
 	}
 	return extractTagsFromText(string(content), fullNotePath, t.NoteMarker, t.pattern)
 }
@@ -113,20 +115,20 @@ func (t *Tags) writeTagsToCache(notePath string, tagsContent string) {
 	fullNoteCachePath := filepath.Join(t.CacheDir, notePath)
 	err := utils.WriteFileWithMkdirAll(fullNoteCachePath, []byte(tagsContent), 0644)
 	if err != nil {
-		utils.PrintfAndExit("Failed to write tags to cache: %s\n%s\n", fullNoteCachePath, err)
+		log.Fatalf("Failed to write tags to cache. %s\n", err)
 	}
 }
 
 func (t *Tags) createAllTagsFromCache() {
 	paths, err := filepathx.Glob(fmt.Sprintf("%s/**/*%s", t.CacheDir, t.NoteExtension))
 	if err != nil {
-		utils.PrintfAndExit("Failed to list notes: %s\n%s\n", t.CacheDir, err)
+		log.Fatalf("Failed to list notes. %s\n", err)
 	}
 	allTagsContent := ""
 	for _, path := range paths {
 		tagsContent, err := os.ReadFile(path)
 		if err != nil {
-			utils.PrintfAndExit("Failed to read tags from cache: %s\n%s\n", path, err)
+			log.Fatalf("Failed to read tags from cache. %s\n", err)
 		}
 		allTagsContent += "\n" + string(tagsContent)
 	}
@@ -134,8 +136,33 @@ func (t *Tags) createAllTagsFromCache() {
 	result := fmt.Sprintf("!_TAG_FILE_SORTED\t1\n%s", allTagsContent)
 	err = utils.WriteFileWithMkdirAll(t.Output, []byte(result), 0644)
 	if err != nil {
-		utils.PrintfAndExit("Failed to write tags: %s\n%s\n", t.Output, err)
+		log.Fatalf("Failed to write tags: %s\n", err)
 	}
+}
+
+func (t *Tags) startWatch() {
+	fmt.Printf("Watching %s\n", t.NoteDir)
+
+	// 	let (tx, rx) = channel();
+	// 	let mut watcher = watcher(tx, Duration::from_secs(1)).unwrap();
+	// 	watcher
+	// 		.watch(&self.note_dir, RecursiveMode::Recursive)
+	// 		.unwrap();
+	// 	loop {
+	// 		match rx.recv() {
+	// 			Err(e) => println!("watch error: {:?}", e),
+	// 			Ok(event) => match event {
+	// 				DebouncedEvent::Write(path) | DebouncedEvent::Create(path) => self.watch_changed(&path),
+	// 				DebouncedEvent::NoticeRemove(path) => self.watch_removed(&path),
+	// 				DebouncedEvent::Rename(_, new) => {
+	// 					self.watch_changed(&new);
+	// 				}
+	// 				_ => {}
+	// 			},
+	// 		}
+	// 	}
+	// }
+
 }
 
 func extractTagsFromText(content string, fullNodePath string, noteMarker string, pattern *regexp.Regexp) string {
