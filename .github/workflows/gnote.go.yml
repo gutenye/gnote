@@ -1,0 +1,18 @@
+name: Gnote (Go)
+
+on: 
+  push: 
+    paths:
+      - gnote.go/**
+
+defaults:
+  run:
+    working-directory: gnote.go
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+      - run: go test
