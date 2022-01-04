@@ -4,10 +4,7 @@ env:
   name: gnote.go
 
 on:
-  workflow_dispatch:
   push:
-    paths:
-      - gnote.go/**
     tags: 
       - go*.*.*
 

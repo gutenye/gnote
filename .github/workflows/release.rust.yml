@@ -5,8 +5,6 @@ env:
 
 on:
   push:
-    paths:
-      - gnote.rs/**
     tags: 
       - rs*.*.*
 
