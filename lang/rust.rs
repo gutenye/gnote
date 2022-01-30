@@ -1,9 +1,8 @@
-#![allow(unused)] // allow unused
+// allow unused var
+#![allow(unused)]
 
-// line comment
-/* block comment */
-/// doc line comment, **markdown**
-/** doc block comment */
+// map
+let a = [10, 11].iter(); let b: Vec<_> = a.map(|v| v + 1).collect();
 
 // Same thing written in multiple ways
 match result { Ok(v) => v, Err(err) => panic!() }
@@ -16,6 +15,12 @@ let a: &str = "a";
 let a: String = String::from("a");
 let a: String = "a".to_string();
 let a: String = "a".into();
+
+// line comment
+/* block comment */
+/// doc line comment, **markdown**
+/** doc block comment */
+
 
 // Error
 enum Result<T, E> { Ok(T), Err(E) }
@@ -70,7 +75,7 @@ loop { break; continue; }
 let a = loop { break 1 }
 
 // Function
-fn fn1() -> u32 {
+fn fn1(a: u32) -> u32 {
 	return 1;
 	1
 }
@@ -95,6 +100,11 @@ let a: [u32; 2] = [1, 2];
 let a: [u32; 2] = [1; 2];
 let a: Vec<u32> = vec![1, 2];
 let a: Vec<u32> = Vec::new();
+// Iterator
+let a = [10, 11].iter();
+for v in a {}
+for (i, v) in a.enumerate() {}
+let b: Vec<_> = a.map(|v| v + 1).collect();
 
 // Struct
 struct Black;         // unit struct

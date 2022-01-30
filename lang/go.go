@@ -1,12 +1,15 @@
-
 package main
 
-/* Dislike
-- no allow unused flag
-- no super map func: b := []string{}; for _, v := range a { b = append(b, v) }
-- no super sort, join func: sort.{Strings,Ints,..}, strings.Join
-- filepath.Glob not support `**`
-*/
+// no allow unused var
+// no super map
+a := []int{10, 11}; b := []int{}; for _, v := range a { b = append(b, v + 1) } // no super map
+// no super sort, join func
+sort.{Strings,Ints,..}, strings.Join
+// filepath.Glob not support `**`
+
+
+
+
 
 // Easy to Read
 v1 := "a"              // var v = "a"
@@ -28,7 +31,7 @@ import _ "fmt"; _ = a
 func hello() (string, error) {
 	return "", errors.New("Error")
 	return "Hello", nil
-}
+
 value, err := hello()
 value2, err := hello() // special, can assign same err variale multiple times
 if err != nil {}
@@ -94,6 +97,11 @@ var a string = "a"
 
 // Array
 var a []int = []int{1,2}
+a := []int{10, 11}
+// Iterator
+for _, v := range a {} 
+for i, v := range a {} 
+b := []int{}; for _, v := range a { b = append(b, v + 1) } // no super map
 
 // Struct
 type Point struct {
