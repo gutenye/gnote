@@ -1,7 +1,17 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bun
 
-case "$1" in
-  "" ) yarn start ;;
-  t | test ) yarn test ;; 
-  t:cmd | test:cmd ) yarn test:cmd ;;
-esac
+import { app, $ } from "@gutenye/script.js";
+
+app.cmd().add(async ({ argv }) => {
+  if (argv.length === 0) {
+    await $`yarn start`;
+  }
+});
+
+app.cmd("t, test", "Run tests").add(async () => {
+  await $`yarn test`;
+});
+
+app.cmd("t:cmd, test:cmd", "Run test:cmd").add(async () => {
+  await $`yarn test:cmd`;
+});

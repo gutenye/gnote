@@ -1,6 +1,7 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bun
 
+import { app, $ } from "@gutenye/script.js";
 
-case "$1" in 
-  actions ) act workflow_dispatch ;;
-esac
+app.cmd("actions", "Trigger workflow_dispatch").add(async () => {
+  await $`act workflow_dispatch`;
+});

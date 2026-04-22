@@ -1,46 +1,43 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bun
 
-VERSION=$(cat VERSION)
+import { app, $ } from "@gutenye/script.js";
+import fs from "node:fs";
 
-cmd="$1"
-shift
+const VERSION = fs.readFileSync("VERSION", "utf8").trim();
 
-main() {
-  case "$cmd" in
-    start ) start "$@" ;;
-    t | test ) go test ./... ;;
-    t:cmd | test:cmd ) start tags --note-dir ../testdata/note --note-marker '*' --note-extension '.gnote' --output ../testdata/tags --cache-dir ../testdata/cache --watch "$@" ;; 
-    publish ) publish ;;
-    build ) build ;;
-    release ) release ;;
-    build-all ) build-all ;;
-  esac
-}
+app.cmd("start", "Run from src").add(async ({ argv }) => {
+  await $`go run . ${argv}`.cwd("src");
+});
 
-start() {
-  cd src && go run . "$@"
-}
+app.cmd("t, test", "Run go tests").add(async () => {
+  await $`go test ./...`;
+});
 
-publish() {
-  build
-  package
-  # upload to github release
-}
+app.cmd("t:cmd, test:cmd", "Run tags command on test data").add(async ({ argv }) => {
+  await $`go run . tags --note-dir ../testdata/note --note-marker '*' --note-extension '.gnote' --output ../testdata/tags --cache-dir ../testdata/cache --watch ${argv}`.cwd("src");
+});
 
+app.cmd("build", "Build binary").add(async () => {
+  await $`
+    mkdir -p dist
+    go build -o dist/gnote
+  `;
+});
 
-build() {
-  mkdir -p dist
-  go build -o dist/gnote
-}
+app.cmd("package", "Package macOS tarball").add(async () => {
+  await $`tar zcvf macos.tar.gz -C dist .`;
+});
 
-package() {
-  tar zcvf macos.tar.gz -C dist  .
-}
+app.cmd("publish", "Build, package and upload").add(async () => {
+  await app.invoke("build");
+  await app.invoke("package");
+  // upload to github release
+});
 
+app.cmd("release", "Release").add(async () => {
+  console.log(`Releasing ${VERSION}`);
+});
 
-build-all() {
-  ./build.sh
-}
-
-
-main "$@"
+app.cmd("build-all", "Run build.sh").add(async () => {
+  await $`./build.sh`;
+});

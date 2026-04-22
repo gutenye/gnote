@@ -1,8 +1,19 @@
-#!/usr/bin/env bash
+#!/usr/bin/env bun
 
-case "$1" in 
-	t | test ) cargo test ;;
-	t:cmd | test:cmd ) shift; cargo run tags --note-dir testdata/note --note-marker '*' --note-extension '.gnote' --output testdata/tags --cache-dir testdata/cache --watch "$@" ;;
-	build ) cargo build --release ;;
-	* ) cargo run -- "$@" ;;
-esac
+import { app, $ } from "@gutenye/script.js";
+
+app.cmd("t, test", "Run cargo tests").add(async () => {
+  await $`cargo test`;
+});
+
+app.cmd("t:cmd, test:cmd", "Run tags command on test data").add(async ({ argv }) => {
+  await $`cargo run tags --note-dir testdata/note --note-marker '*' --note-extension '.gnote' --output testdata/tags --cache-dir testdata/cache --watch ${argv}`;
+});
+
+app.cmd("build", "Build release").add(async () => {
+  await $`cargo build --release`;
+});
+
+app.cmd().add(async ({ argv }) => {
+  await $`cargo run -- ${argv}`;
+});
